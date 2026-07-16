@@ -101,5 +101,34 @@ const sorted = scrambled.map((n, idx) => ({ n, idx }))
   .map(o => o.n.steg + '#' + o.n.i);
 eq('sortert rekkefølge', sorted.join(','), 'hjemme#2,hjemme#4,vurdering#3,forstedogn#0,#1');
 
+console.log('Del i to (oppgave 2):');
+(() => {
+  const orig = gyldig({
+    id: 'norig', title: 'Stort behov', steg: 'vurdering',
+    behov: [Component.bf('b1', 'pasient', 'x'), Component.bf('b2', 'parorende', 'y')],
+    konsekvenser: [{ id: 'k1', text: 'kons1', rammer: {}, status: 'pastatt' }, { id: 'k2', text: 'kons2', rammer: {}, status: 'pastatt' }],
+    tall: [{ id: 't1', text: 'tall1', status: 'bestilles', konsIds: ['k1'], behovIds: ['b1'], losIds: [] }]
+  });
+  let del = Component.delInit(orig, 'nny');
+  eq('A starter med alle behovslinjer', del.a.behov.length, 2);
+  eq('B starter tom', del.b.behov.length + del.b.konsekvenser.length + del.b.tall.length, 0);
+  ok('B har ny id', del.b.id !== del.a.id);
+  // flytt én behovslinje, én konsekvens og tallet til B
+  del = Component.delFlytt(del, 'a', 'behov', 'b2');
+  del = Component.delFlytt(del, 'a', 'konsekvenser', 'k2');
+  del = Component.delFlytt(del, 'a', 'tall', 't1');
+  const totalBehov = del.a.behov.length + del.b.behov.length;
+  const totalKons = del.a.konsekvenser.length + del.b.konsekvenser.length;
+  const totalTall = del.a.tall.length + del.b.tall.length;
+  eq('ingen behovslinje mistet', totalBehov, 2);
+  eq('ingen konsekvens mistet', totalKons, 2);
+  eq('ingen tall mistet', totalTall, 1);
+  eq('b2 havnet på B', del.b.behov[0].id, 'b2');
+  // steg/tittel-kravet
+  ok('lik steg + lik tittel → kan IKKE lukke', !Component.delKanLukkes({ steg: 'vurdering', title: 'Samme' }, { steg: 'vurdering', title: 'Samme' }));
+  ok('ulik tittel → kan lukke', Component.delKanLukkes({ steg: 'vurdering', title: 'A' }, { steg: 'vurdering', title: 'B' }));
+  ok('ulikt steg → kan lukke', Component.delKanLukkes({ steg: 'hjemme', title: 'Samme' }, { steg: 'vurdering', title: 'Samme' }));
+})();
+
 console.log('\n' + passed + ' passerte, ' + failed + ' feilet.');
 process.exit(failed ? 1 : 0);

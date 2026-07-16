@@ -2238,6 +2238,69 @@ select.bv:hover{border-color:#2B5F7D}
     </div>
   </sc-if>
 
+  <!-- ===================== DEL I TO ===================== -->
+  <sc-if value="{{ delOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="bv-noprint" style="position:fixed;inset:0;background:rgba(34,48,59,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="background:#fff;border-radius:16px;max-width:920px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+        <div style="padding:22px 28px 14px;border-bottom:1px solid #EDE9E0">
+          <div style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#2B5F7D;font-weight:700">Del i to</div>
+          <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;margin-top:3px">Fordel linjer, konsekvenser og tall</div>
+          <div style="font-size:12.5px;color:#6B7885;margin-top:5px;line-height:1.5">Alt ligger på A i utgangspunktet. Flytt det som hører til det andre behovet over på B. Ingenting mistes — hvert element havner på nøyaktig ett av kortene.</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:18px 28px">
+          <sc-for list="{{ del.sides }}" as="s" hint-placeholder-count="2">
+            <div style="border:1px solid #E7E2D9;border-radius:12px;padding:14px 15px;background:#FBFAF7">
+              <div style="font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#8B94A0;font-weight:700">Behov {{ s.tag }}</div>
+              <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ s.edTitle }}" data-ph="Tittel" style="font-size:15px;font-weight:700;margin-top:4px;min-height:18px">{{ s.title }}</div>
+              <div style="display:flex;align-items:center;gap:7px;margin-top:8px">
+                <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700">Steg</span>
+                <sc-raw-select class="bv" value="{{ s.steg }}" sc-camel-on-change="{{ s.setSteg }}">
+                  <sc-for list="{{ s.stegOptions }}" as="o" hint-placeholder-count="9"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                </sc-raw-select>
+              </div>
+
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700;margin-top:13px">Behovslinjer</div>
+              <div style="display:flex;flex-direction:column;gap:5px;margin-top:5px">
+                <sc-for list="{{ s.behov }}" as="it" hint-placeholder-count="2">
+                  <div style="display:flex;gap:7px;align-items:center;background:#fff;border:1px solid #E7E2D9;border-radius:7px;padding:5px 8px">
+                    <span style="flex:1;font-size:11.5px;line-height:1.35">{{ it.label }}</span>
+                    <button sc-camel-on-click="{{ it.move }}" style="flex:none;border:1px solid #D5DBE0;background:#F4F2EC;cursor:pointer;border-radius:6px;padding:2px 8px;font-size:10.5px;color:#2B5F7D;font-family:inherit;white-space:nowrap">{{ s.moveLabel }}</button>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700;margin-top:11px">Konsekvenser</div>
+              <div style="display:flex;flex-direction:column;gap:5px;margin-top:5px">
+                <sc-for list="{{ s.konsekvenser }}" as="it" hint-placeholder-count="2">
+                  <div style="display:flex;gap:7px;align-items:center;background:#fff;border:1px solid #E7E2D9;border-radius:7px;padding:5px 8px">
+                    <span style="flex:1;font-size:11.5px;line-height:1.35">{{ it.label }}</span>
+                    <button sc-camel-on-click="{{ it.move }}" style="flex:none;border:1px solid #D5DBE0;background:#F4F2EC;cursor:pointer;border-radius:6px;padding:2px 8px;font-size:10.5px;color:#2B5F7D;font-family:inherit;white-space:nowrap">{{ s.moveLabel }}</button>
+                  </div>
+                </sc-for>
+              </div>
+
+              <div style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700;margin-top:11px">Tall</div>
+              <div style="display:flex;flex-direction:column;gap:5px;margin-top:5px">
+                <sc-for list="{{ s.tall }}" as="it" hint-placeholder-count="2">
+                  <div style="display:flex;gap:7px;align-items:center;background:#fff;border:1px solid #E7E2D9;border-radius:7px;padding:5px 8px">
+                    <span style="flex:1;font-size:11.5px;line-height:1.35">{{ it.label }}</span>
+                    <button sc-camel-on-click="{{ it.move }}" style="flex:none;border:1px solid #D5DBE0;background:#F4F2EC;cursor:pointer;border-radius:6px;padding:2px 8px;font-size:10.5px;color:#2B5F7D;font-family:inherit;white-space:nowrap">{{ s.moveLabel }}</button>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ s.tom }}" hint-placeholder-val="{{ false }}"><div style="font-size:11px;color:#B8B2A6;font-style:italic">tomt — flytt elementer hit</div></sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:14px 28px 22px;border-top:1px solid #EDE9E0;display:flex;align-items:center;gap:12px">
+          <span style="flex:1;font-size:11.5px;color:#A2544C;font-weight:600">{{ del.lukkReason }}</span>
+          <button sc-camel-on-click="{{ del.cancel }}" style="border:1px solid #D5DBE0;background:#fff;color:#5B6772;cursor:pointer;padding:9px 18px;border-radius:999px;font-size:12.5px;font-weight:600;font-family:inherit">Avbryt</button>
+          <button sc-camel-on-click="{{ del.confirm }}" style="border:none;background:{{ del.confirmBg }};color:#fff;cursor:{{ del.confirmCursor }};padding:9px 20px;border-radius:999px;font-size:12.5px;font-weight:600;font-family:inherit">Lukk og lag to behov</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <!-- ===================== ARBEIDSFLATE ===================== -->
   <sc-if value="{{ isArbeid }}" hint-placeholder-val="{{ true }}">
     <div style="display:grid;grid-template-columns:270px 1fr;flex:1;min-height:0">
@@ -2269,6 +2332,7 @@ select.bv:hover{border-color:#2B5F7D}
             <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ cur.edTitle }}" data-ph="Tittel på behovet" style="font-size:22px;font-weight:700;letter-spacing:-0.01em;line-height:1.2">{{ cur.title }}</div>
             <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ cur.edGroup }}" data-ph="Pasientgruppe / fase" style="font-size:13px;color:#6B7885;margin-top:2px;min-height:16px">{{ cur.group }}</div>
           </div>
+          <button sc-camel-on-click="{{ cur.startDel }}" title="Del behovet i to og fordel linjer, konsekvenser og tall" style="border:1px solid #D5DBE0;background:#fff;color:#2B5F7D;cursor:pointer;border-radius:8px;padding:6px 12px;font-size:11.5px;font-family:inherit">Del i to</button>
           <button sc-camel-on-click="{{ cur.removeNeed }}" style="border:1px solid #E7DAD8;background:#fff;color:#A2544C;cursor:pointer;border-radius:8px;padding:6px 12px;font-size:11.5px;font-family:inherit">Slett behov</button>
         </div>
 
@@ -2325,11 +2389,21 @@ select.bv:hover{border-color:#2B5F7D}
                       <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ b.edAndre }}" data-ph="hvem?" style="font-size:12px;border:1px solid #D5DBE0;border-radius:6px;padding:3px 8px;min-width:80px">{{ b.andre }}</span>
                     </sc-if>
                   </div>
-                  <div style="display:flex;gap:6px;margin-top:8px">
-                    <span sc-camel-on-click="{{ b.cycleProv }}" title="Provenans" style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;background:{{ b.provBg }};color:{{ b.provFg }}">{{ b.provLabel }}</span>
+                  <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center">
+                    <span sc-camel-on-click="{{ b.cycleProv }}" title="Provenans (antatt ↔ sagt; belagt settes automatisk)" style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;cursor:pointer;background:{{ b.provBg }};color:{{ b.provFg }}">{{ b.provLabel }}</span>
+                    <sc-if value="{{ b.kildeMangler }}" hint-placeholder-val="{{ false }}">
+                      <span title="«sagt» uten kilde" style="padding:2px 8px;border-radius:999px;font-size:10px;font-weight:700;background:#F7E4CE;color:#A2544C">kilde mangler</span>
+                    </sc-if>
                     <span sc-camel-on-click="{{ b.toggleVetIkke }}" title="Vet ikke" style="padding:2px 7px;border-radius:999px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid {{ b.viBd }};color:{{ b.viFg }};background:{{ b.viBg }}">vet ikke</span>
                   </div>
                   <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ b.ed }}" data-ph="Hva trenger de?" style="font-size:13px;line-height:1.45;margin-top:7px;min-height:18px">{{ b.text }}</div>
+                  <sc-if value="{{ b.hasSitat }}" hint-placeholder-val="{{ false }}">
+                    <details style="margin-top:7px;background:#F6F4EE;border:1px solid #E3DECF;border-radius:8px;padding:6px 9px">
+                      <summary style="font-size:10.5px;font-weight:700;color:#5A4E86;cursor:pointer">Originalsitat (etterprøvbar oversettelse)</summary>
+                      <div style="font-size:12px;font-style:italic;color:#3F4A54;margin-top:5px;line-height:1.45">«{{ b.sitat }}»</div>
+                      <div style="font-size:10.5px;color:#8B94A0;margin-top:3px">{{ b.kildeMeta }}</div>
+                    </details>
+                  </sc-if>
                 </div>
               </sc-for>
               <button sc-camel-on-click="{{ cur.addBehov }}" style="border:1px dashed #B9B2A3;background:none;cursor:pointer;border-radius:10px;padding:12px;font-size:12px;color:#6B7885;font-weight:600;font-family:inherit;min-height:60px">+ Behov / aktør</button>
@@ -2717,7 +2791,14 @@ select.bv:hover{border-color:#2B5F7D}
               <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#22303B;font-weight:700">A · Behovsbildet</div>
               <div style="display:flex;flex-direction:column;gap:7px;margin-top:7px">
                 <sc-for list="{{ r.aFields }}" as="f" hint-placeholder-count="3">
-                  <div style="font-size:12.5px;line-height:1.5"><span style="color:#8B94A0;font-weight:600">{{ f.label }}:</span> {{ f.text }} <span style="padding:0 7px;border-radius:999px;font-size:9.5px;font-weight:700;background:{{ f.provBg }};color:{{ f.provFg }}">{{ f.provLabel }}</span></div>
+                  <div style="font-size:12.5px;line-height:1.5">
+                    <span style="color:#8B94A0;font-weight:600">{{ f.label }}:</span> {{ f.text }}
+                    <span style="padding:0 7px;border-radius:999px;font-size:9.5px;font-weight:700;background:{{ f.provBg }};color:{{ f.provFg }}">{{ f.provLabel }}</span>
+                    <sc-if value="{{ f.kildeMangler }}" hint-placeholder-val="{{ false }}"><span style="padding:0 7px;border-radius:999px;font-size:9.5px;font-weight:700;background:#F7E4CE;color:#A2544C">kilde mangler</span></sc-if>
+                    <sc-if value="{{ f.hasSitat }}" hint-placeholder-val="{{ false }}">
+                      <div style="font-size:11.5px;font-style:italic;color:#5B6772;margin-top:2px;padding-left:10px;border-left:2px solid #D9D2E4">«{{ f.sitat }}» <span style="font-style:normal;color:#9AA4AE">— {{ f.kildeMeta }}</span></div>
+                    </sc-if>
+                  </div>
                 </sc-for>
               </div>
             </div>
@@ -2770,16 +2851,21 @@ select.bv:hover{border-color:#2B5F7D}
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{}">
 class Component extends DCLogic {
-  state = { tab: 'arbeid', sel: null, needs: null, lib: null, hjelp: true };
+  state = { tab: 'arbeid', sel: null, needs: null, lib: null, hjelp: true, del: null };
 
+  // Provenans: 'belagt' settes AUTOMATISK når et tall med status 'har' kobles til
+  // linja (aldri manuelt). 'sagt' krever en kilde (sitat eller kildeNote). Den
+  // manuelle vekslingen går derfor antatt ↔ sagt — se behovVM.cycleProv.
   static PROV = {
-    sagt:   { label: 'Sagt av dem',      short: 'sagt',   bg: '#E4F1EA', fg: '#2E7D5B', next: 'antatt' },
-    antatt: { label: 'Antatt av oss',    short: 'antatt', bg: '#FCF4E4', fg: '#A66A1F', next: 'belagt', ramme: '#EAD9B8' },
-    belagt: { label: 'Belagt med tall',  short: 'belagt', bg: '#E3EDF3', fg: '#2B5F7D', next: 'sagt' }
+    sagt:   { label: 'Sagt av dem',      short: 'sagt',   bg: '#E4F1EA', fg: '#2E7D5B' },
+    antatt: { label: 'Antatt av oss',    short: 'antatt', bg: '#FCF4E4', fg: '#A66A1F', ramme: '#EAD9B8' },
+    belagt: { label: 'Belagt med tall',  short: 'belagt', bg: '#E3EDF3', fg: '#2B5F7D' }
   };
   static KSTATUS = {
-    omforent: { label: 'Omforent med kommunen', short: 'omforent', bg: '#E4F1EA', fg: '#2E7D5B', accent: '#2E7D5B', next: 'pastatt' },
-    pastatt:  { label: 'Påstått av oss — ikke omforent', short: 'påstått', bg: '#F3E3E1', fg: '#A2544C', accent: '#C0574F', next: 'omforent' }
+    omforent:  { label: 'Omforent med kommunen', short: 'omforent', bg: '#E4F1EA', fg: '#2E7D5B', accent: '#2E7D5B', next: 'pastatt' },
+    pastatt:   { label: 'Påstått av oss — ikke omforent', short: 'påstått', bg: '#F3E3E1', fg: '#A2544C', accent: '#C0574F', next: 'omforent' },
+    // Fra Forløpsbygger-import — teller som påstått (IKKE omforent) i trinn 2-porten.
+    observert: { label: 'Observert i forløpskartlegging — ikke omforent', short: 'observert', bg: '#EAE6F3', fg: '#5A4E86', accent: '#7A6BB0', next: 'omforent' }
   };
   static TSTATUS = {
     har:        { label: '① Har tallet',            short: 'har tallet',   bg: '#E4F1EA', fg: '#2E7D5B', next: 'bestilles' },
@@ -2792,13 +2878,14 @@ class Component extends DCLogic {
     'Felles':  { text: 'Felles',  bg: '#E7E9F5', fg: '#4C5A9E', next: 'Uklart' },
     'Uklart':  { text: 'Uklart — kjernespørsmål', bg: '#F7ECD9', fg: '#A66A1F', next: 'SiV' }
   };
-  static RAMME = { pasient: 'Pasient', personell: 'Personell', system: 'System' };
+  static RAMME = { pasient: 'Pasient', parorende: 'Pårørende', personell: 'Personell', system: 'System' };
   static HVEM = { pasient: 'Pasient', parorende: 'Pårørende', helsepersonell: 'Helsepersonell', andre: 'Andre' };
   static TRINN = [
     { n: 0, title: 'Forebygg', hint: 'reduser at behovet oppstår', badgeBg: '#F7ECD9', badgeFg: '#A66A1F' },
     { n: 1, title: 'I linja / dagens ordninger', hint: 'kjentgjøre, mandat, kontaktvei', badgeBg: '#E9EDF0', badgeFg: '#4A5A67' },
     { n: 2, title: 'Utvidelse av dagens', hint: 'mer kraft på samme linje', badgeBg: '#E3EDF3', badgeFg: '#2B5F7D' },
-    { n: 3, title: 'Ny tjeneste / organisering', hint: 'siste utvei', badgeBg: '#F3E3E1', badgeFg: '#A2544C' }
+    { n: 3, title: 'Ny tjeneste / organisering', hint: 'innenfor dagens struktur', badgeBg: '#F3E3E1', badgeFg: '#A2544C' },
+    { n: 4, title: 'Mobilisering / strukturell nyskaping', hint: 'på tvers av aktørene — alltid probe, aldri plan', badgeBg: '#EDE3F3', badgeFg: '#7A4E86' }
   ];
 
   static libDefaults() {
@@ -2823,7 +2910,47 @@ class Component extends DCLogic {
   }
 
   static af(text, prov, vetIkke) { return { text: text || '', prov: prov || 'antatt', vetIkke: !!vetIkke }; }
-  static bf(id, hvem, text, prov, extra) { return Object.assign({ id, hvem: hvem || 'pasient', text: text || '', prov: prov || 'antatt', vetIkke: false, aktor: '', rolle: '', andre: '' }, extra || {}); }
+  static bf(id, hvem, text, prov, extra) { return Object.assign({ id, hvem: hvem || 'pasient', text: text || '', prov: prov || 'antatt', vetIkke: false, aktor: '', rolle: '', andre: '', kilde: null }, extra || {}); }
+
+  // ---- kilde/provenans på behovslinjer ----
+  // kilde = { sitat, note, arena, dato, innboksIds:[] } — settes ved grooming fra
+  // innboks (oppgave 6) eller manuelt når man setter 'sagt'.
+  static lineKilde(b) { return (b && b.kilde) || null; }
+  static lineHasKilde(b) { const k = Component.lineKilde(b); return !!(k && (((k.sitat || '') + '').trim() || ((k.note || '') + '').trim())); }
+  // 'belagt' settes automatisk når et tall med status 'har' er koblet til linja via behovIds.
+  static lineBelagt(n, b) { return (n.tall || []).some(t => t.status === 'har' && (t.behovIds || []).indexOf(b.id) !== -1); }
+  // Vist provenans: 'belagt' (auto) hvis koblet 'har'-tall; ellers lagret prov (legacy 'belagt' → 'antatt').
+  static provDisp(n, b) { if (Component.lineBelagt(n, b)) return 'belagt'; return b.prov === 'belagt' ? 'antatt' : (b.prov || 'antatt'); }
+  // «sagt» kan aldri oppstå uten kilde (koblet sitat eller eksplisitt kildeNote).
+  static kanVaereSagt(b) { return Component.lineHasKilde(b); }
+
+  // ---- «Del i to» (oppgave 2) — rene hjelpere, testbare ----
+  static clone(o) { return JSON.parse(JSON.stringify(o)); }
+  // Startoppsett: A beholder alt, B er tom klone (ny id, tittel + « (2)»).
+  static delInit(need, nyId) {
+    const a = Component.clone(need);
+    const b = Component.clone(need);
+    b.id = nyId; b.title = (need.title || 'Behov') + ' (2)';
+    b.behov = []; b.konsekvenser = []; b.tall = []; b.losninger = [];
+    return { a, b };
+  }
+  // Flytt ett element (kind: 'behov'|'konsekvenser'|'tall') fra side ('a'|'b') til den andre.
+  static delFlytt(del, side, kind, id) {
+    const d = { a: Component.clone(del.a), b: Component.clone(del.b) };
+    const from = side, to = side === 'a' ? 'b' : 'a';
+    const arr = d[from][kind] || [];
+    const idx = arr.findIndex(x => x.id === id);
+    if (idx === -1) return del;
+    const [item] = arr.splice(idx, 1);
+    d[from][kind] = arr;
+    d[to][kind] = (d[to][kind] || []).concat([item]);
+    return d;
+  }
+  // Krav før dialogen kan lukkes: ulikt forløpssteg ELLER ulik tittel.
+  static delKanLukkes(a, b) {
+    return (a.steg || '') !== (b.steg || '') ||
+           ((a.title || '') + '').trim() !== ((b.title || '') + '').trim();
+  }
 
   // ---- forløpssteg fra felles/schema.json (injisert som window.SIV_SCHEMA av sync.js) ----
   // Aldri hardkod steg-lista her — endre felles/schema.json og kjør `node sync.js`.
@@ -2908,6 +3035,26 @@ class Component extends DCLogic {
   dismissHjelp() { this.setState({ hjelp: false }); }
   uid(p) { return p + Math.random().toString(36).slice(2, 8); }
 
+  // ---- «Del i to» ----
+  startDel(needId) {
+    const n = this.getNeeds().find(x => x.id === needId);
+    if (!n) return;
+    this.setState({ del: Component.delInit(n, this.uid('n')) });
+  }
+  delFlytt(side, kind, id) { this.setState(s => ({ del: s.del ? Component.delFlytt(s.del, side, kind, id) : s.del })); }
+  delEdit(side, field, value) { this.setState(s => { if (!s.del) return {}; const del = { a: { ...s.del.a }, b: { ...s.del.b } }; del[side] = { ...del[side], [field]: value }; return { del }; }); }
+  delCancel() { this.setState({ del: null }); }
+  delConfirm() {
+    const del = this.state.del; if (!del) return;
+    if (!Component.delKanLukkes(del.a, del.b)) return;
+    this.setNeeds(ns => {
+      const out = [];
+      ns.forEach(n => { if (n.id === del.a.id) { out.push(del.a); out.push(del.b); } else out.push(n); });
+      return out;
+    });
+    this.setState({ del: null, sel: del.a.id });
+  }
+
   opts(values, current, optional) {
     const arr = (values || []).slice();
     if (current && arr.indexOf(current) === -1) arr.unshift(current);
@@ -2963,18 +3110,41 @@ class Component extends DCLogic {
       ramme: isAntatt ? '#EAD9B8' : '#E7E2D9', cardBg: isAntatt ? '#FEFBF4' : '#fff',
       viBg: f.vetIkke ? '#EDEDED' : '#fff', viBd: f.vetIkke ? '#B9B2A3' : '#D5DBE0', viFg: f.vetIkke ? '#5B6772' : '#B0A99B',
       ed: e => upd(y => ({ ...y, text: e.target.innerText })),
-      cycleProv: () => upd(y => ({ ...y, prov: (Component.PROV[y.prov] || Component.PROV.antatt).next })),
+      cycleProv: () => upd(y => ({ ...y, prov: (y.prov === 'sagt' ? 'antatt' : 'sagt') })),
       toggleVetIkke: () => upd(y => ({ ...y, vetIkke: !y.vetIkke }))
     };
   }
 
+  // Manuell veksling av behovslinje-provenans: antatt ↔ sagt.
+  // 'belagt' er auto (koblet 'har'-tall) og kan ikke velges manuelt.
+  // 'sagt' krever kilde — mangler den, spør vi om en kildeNote.
+  cycleBehovProv(needId, j) {
+    this.update(needId, x => ({ ...x, behov: (x.behov || []).map((y, m) => {
+      if (m !== j) return y;
+      const disp = Component.provDisp(x, y);
+      if (disp === 'belagt') { window.alert('«Belagt med tall» settes automatisk fra et koblet tall med status «har». Koble eller fjern tallet for å endre.'); return y; }
+      if (disp === 'antatt') {
+        if (Component.kanVaereSagt(y)) return { ...y, prov: 'sagt' };
+        const note = window.prompt('«Sagt av dem» krever en kilde.\nHvem sa det, og hvor? (f.eks. «hjemmesykepleier, morgenmøte 12.03.2026»)');
+        if (note && note.trim()) { const kilde = Object.assign({ sitat: '', note: '', arena: '', dato: '', innboksIds: [] }, y.kilde || {}, { note: note.trim() }); return { ...y, prov: 'sagt', kilde }; }
+        return y;
+      }
+      return { ...y, prov: 'antatt' };
+    }) }));
+  }
+
   behovVM(n, b, j, lib) {
-    const P = Component.PROV[b.prov] || Component.PROV.antatt;
+    const dispProv = Component.provDisp(n, b);
+    const P = Component.PROV[dispProv] || Component.PROV.antatt;
     const upd = fn => this.update(n.id, x => ({ ...x, behov: x.behov.map((y, m) => m === j ? fn(y) : y) }));
-    const isAntatt = b.prov === 'antatt' && !b.vetIkke;
+    const isAntatt = dispProv === 'antatt' && !b.vetIkke;
+    const kildeMangler = dispProv === 'sagt' && !Component.kanVaereSagt(b);
+    const kd = Component.lineKilde(b) || {};
     const names = (lib.aktorer || []).map(a => a.navn);
     return {
       text: b.text, hvem: b.hvem, vetIkke: b.vetIkke,
+      kildeMangler, hasSitat: !!((kd.sitat || '') + '').trim(), sitat: kd.sitat || '',
+      kildeMeta: [kd.arena, kd.dato].filter(Boolean).join(' · ') || (((kd.note || '') + '').trim() || ''),
       hvemOptions: Object.keys(Component.HVEM).map(k => ({ value: k, label: Component.HVEM[k] })),
       setHvem: e => upd(y => ({ ...y, hvem: e.target.value })),
       showAktor: b.hvem === 'helsepersonell', showAndre: b.hvem === 'andre',
@@ -2988,7 +3158,7 @@ class Component extends DCLogic {
       ramme: isAntatt ? '#EAD9B8' : '#E7E2D9', cardBg: isAntatt ? '#FEFBF4' : '#fff',
       viBg: b.vetIkke ? '#EDEDED' : '#fff', viBd: b.vetIkke ? '#B9B2A3' : '#D5DBE0', viFg: b.vetIkke ? '#5B6772' : '#B0A99B',
       ed: e => upd(y => ({ ...y, text: e.target.innerText })),
-      cycleProv: () => upd(y => ({ ...y, prov: (Component.PROV[y.prov] || Component.PROV.antatt).next })),
+      cycleProv: () => this.cycleBehovProv(n.id, j),
       toggleVetIkke: () => upd(y => ({ ...y, vetIkke: !y.vetIkke })),
       remove: () => this.update(n.id, x => ({ ...x, behov: x.behov.filter((_, m) => m !== j), tall: (x.tall || []).map(t => ({ ...t, behovIds: (t.behovIds || []).filter(id => id !== b.id) })) }))
     };
@@ -3134,6 +3304,7 @@ class Component extends DCLogic {
       tall,
       addTall: () => this.update(n.id, x => ({ ...x, tall: [...(x.tall || []), { id: this.uid('t'), text: '', status: 'bestilles', verdi: '', kilde: '', eier: '', frist: '', konsIds: [] }] })),
       bOpen, bLocked: !bOpen, bLockReason: 'beskriv minst én konsekvens i K først', trinn,
+      startDel: () => this.startDel(n.id),
       removeNeed: () => { if (window.confirm('Slette «' + n.title + '»?')) this.setNeeds(ns => ns.filter(x => x.id !== n.id)); }
     };
   }
@@ -3191,8 +3362,14 @@ class Component extends DCLogic {
       const A = Component.ANSVAR[n.ansvar] || Component.ANSVAR['Uklart'];
       const tidTxt = ['D', 'K', 'N', 'H'].filter(k => (n.tid || {})[k]).map(k => ({ D: 'dag', K: 'kveld', N: 'natt', H: 'helg' }[k])).join(' · ') || '—';
       const pf = provShort((n.problemstilling || {}).prov);
-      const aF = [{ label: 'Problemstilling', text: (n.problemstilling && n.problemstilling.text) || '—', provLabel: pf.short, provBg: pf.bg, provFg: pf.fg }]
-        .concat((n.behov || []).map(b => { const P = provShort(b.prov); return { label: 'Behov — ' + this.behovLabel(b), text: b.vetIkke ? '(vet ikke)' : (b.text || '—'), provLabel: P.short, provBg: P.bg, provFg: P.fg }; }));
+      const aF = [{ label: 'Problemstilling', text: (n.problemstilling && n.problemstilling.text) || '—', provLabel: pf.short, provBg: pf.bg, provFg: pf.fg, hasSitat: false, sitat: '', kildeMeta: '', kildeMangler: false }]
+        .concat((n.behov || []).map(b => {
+          const dp = Component.provDisp(n, b); const P = provShort(dp);
+          const kd = Component.lineKilde(b) || {};
+          return { label: 'Behov — ' + this.behovLabel(b), text: b.vetIkke ? '(vet ikke)' : (b.text || '—'), provLabel: P.short, provBg: P.bg, provFg: P.fg,
+            hasSitat: !!(((kd.sitat || '') + '').trim()), sitat: kd.sitat || '', kildeMeta: [kd.arena, kd.dato].filter(Boolean).join(' · '),
+            kildeMangler: dp === 'sagt' && !Component.kanVaereSagt(b) };
+        }));
       return {
         title: n.title, group: n.group, ansvarText: A.text, ansvarBg: A.bg, ansvarFg: A.fg, tidTxt,
         stegTxt: Component.stegNavn(n.steg) || 'steg ikke valgt', stegMissing: !n.steg,
@@ -3231,9 +3408,38 @@ class Component extends DCLogic {
     });
     const uplassertKort = raw.filter(n => !n.steg || !stegList.some(s => s.id === n.steg)).map(kortFor);
 
+    // «Del i to»-dialog
+    const del = this.state.del;
+    let delVM = null;
+    if (del) {
+      const stegOpts = [{ value: '', label: '— velg forløpssteg —' }].concat(Component.FORLOPSSTEG().map(s => ({ value: s.id, label: s.navn })));
+      const kanLukke = Component.delKanLukkes(del.a, del.b);
+      const sideVM = side => {
+        const nd = del[side];
+        const listOf = (kind, labelFn) => (nd[kind] || []).map(it => ({ id: it.id, label: labelFn(it), move: () => this.delFlytt(side, kind, it.id) }));
+        return {
+          side, tag: side === 'a' ? 'A' : 'B', title: nd.title || '', steg: nd.steg || '',
+          edTitle: e => this.delEdit(side, 'title', e.target.innerText),
+          setSteg: e => this.delEdit(side, 'steg', e.target.value),
+          stegOptions: stegOpts, moveLabel: side === 'a' ? 'flytt til B →' : '← flytt til A',
+          behov: listOf('behov', b => this.behovLabel(b) + (b.text ? ': ' + b.text.slice(0, 44) : '')),
+          konsekvenser: listOf('konsekvenser', k => (k.text || '(konsekvens)').slice(0, 54)),
+          tall: listOf('tall', t => (t.text || '(tall)').slice(0, 54)),
+          tom: (nd.behov || []).length + (nd.konsekvenser || []).length + (nd.tall || []).length === 0
+        };
+      };
+      delVM = {
+        sides: [sideVM('a'), sideVM('b')], kanLukke,
+        lukkReason: kanLukke ? '' : 'De to behovene må ha ulikt forløpssteg ELLER ulik tittel før du kan lukke.',
+        confirmBg: kanLukke ? '#2B5F7D' : '#B7C2CA', confirmCursor: kanLukke ? 'pointer' : 'not-allowed',
+        confirm: () => this.delConfirm(), cancel: () => this.delCancel(), stop: e => e.stopPropagation()
+      };
+    }
+
     return {
       isArbeid: tab === 'arbeid', isBib: tab === 'bibliotek', isRapport: tab === 'rapport', isForlop: tab === 'forlop',
       forlopKolonner, uplassertKort, harUplassert: uplassertKort.length > 0,
+      delOpen: !!del, del: delVM,
       tabs, rail, cur,
       hjelp: this.state.hjelp, stop: e => e.stopPropagation(),
       openHjelp: () => this.setState({ hjelp: true }), dismissHjelp: () => this.dismissHjelp(),
