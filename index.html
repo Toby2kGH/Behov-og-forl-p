@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SiV-verktøy — Forløpsbygger + Behovsanalyse</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: #EDEAE3;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #22303B;
+    display: flex; align-items: center; justify-content: center; padding: 28px; }
+  .wrap { width: 100%; max-width: 820px; }
+  .brand { display: flex; align-items: center; gap: 13px; margin-bottom: 6px; }
+  .logo { width: 40px; height: 40px; background: #2B5F7D; color: #fff; border-radius: 9px;
+    display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.01em; margin: 0; }
+  .sub { font-size: 13.5px; color: #6B7885; margin: 4px 0 26px; line-height: 1.55; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+  a.card { display: block; text-decoration: none; color: inherit; background: #FBFAF7;
+    border: 1px solid #E7E2D9; border-radius: 14px; padding: 22px 22px 20px;
+    transition: border-color .15s, transform .15s, box-shadow .15s; }
+  a.card:hover { border-color: #2B5F7D; transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(34,48,59,.09); }
+  .tag { font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase;
+    font-weight: 700; color: #2B5F7D; }
+  .card h2 { font-size: 17px; font-weight: 700; margin: 5px 0 6px; }
+  .card p { font-size: 12.5px; color: #5B6772; line-height: 1.5; margin: 0; }
+  .go { display: inline-block; margin-top: 14px; font-size: 12.5px; font-weight: 600;
+    color: #2B5F7D; }
+  .flow { font-size: 12px; color: #8B94A0; margin-top: 24px; line-height: 1.6; }
+  .flow b { color: #5B6772; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">SiV</div>
+      <div>
+        <h1>SiV-verktøy — pasientforløp Tønsberg × SiV</h1>
+      </div>
+    </div>
+    <div class="sub">To frittstående verktøy for behovsbasert tjenesteutvikling.
+      Data lagres lokalt i nettleseren din — del arbeid via JSON-eksport og PDF-rapporten.</div>
+
+    <div class="grid">
+      <a class="card" href="/forlop">
+        <div class="tag">Workshop · møtenivå</div>
+        <h2>Forløpsbygger</h2>
+        <p>Kartlegg dagens forløp møte for møte, sett røde friksjonsflagg og
+          simuler ny situasjon (verdistrøm). Eksporter friksjonspunktene til
+          Behovsanalysen.</p>
+        <span class="go">Åpne Forløpsbygger →</span>
+      </a>
+      <a class="card" href="/behov">
+        <div class="tag">Analyse · behovsnivå</div>
+        <h2>Behovsanalyse</h2>
+        <p>Løft friksjon og brukerhistorier til behov → konsekvenser → tall →
+          løsninger, med porter og trinnstige. Lag rapporten til SSU.</p>
+        <span class="go">Åpne Behovsanalyse →</span>
+      </a>
+    </div>
+
+    <div class="flow">
+      <b>Flyt:</b> Workshop i Forløpsbyggeren → Eksporter JSON → Importer
+      friksjonspunkter i Behovsanalysen → analyser → Skriv ut rapport (PDF) til SSU.
+    </div>
+  </div>
+</body>
+</html>
