@@ -2301,6 +2301,34 @@ select.bv:hover{border-color:#2B5F7D}
     </div>
   </sc-if>
 
+  <!-- ===================== FASE → STEG (friksjonsimport) ===================== -->
+  <sc-if value="{{ fasemapOpen }}" hint-placeholder-val="{{ false }}">
+    <div class="bv-noprint" style="position:fixed;inset:0;background:rgba(34,48,59,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:24px">
+      <div style="background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:90vh;overflow:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+        <div style="padding:22px 26px 12px;border-bottom:1px solid #EDE9E0">
+          <div style="font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#2B5F7D;font-weight:700">Friksjonsimport</div>
+          <div style="font-size:19px;font-weight:700;margin-top:3px">Ukjent fase — velg forløpssteg</div>
+          <div style="font-size:12.5px;color:#6B7885;margin-top:5px;line-height:1.5">Noen møter kommer fra faser som ikke finnes i faseTilSteg-tabellen. Velg hvilket forløpssteg hver fase hører til før de {{ fasemap.antall }} utkastene legges i innboksen.</div>
+        </div>
+        <div style="padding:16px 26px;display:flex;flex-direction:column;gap:11px">
+          <sc-for list="{{ fasemap.faser }}" as="f" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="flex:1;font-size:13px;font-weight:600">{{ f.faseNavn }}</span>
+              <sc-raw-select class="bv" value="{{ f.steg }}" sc-camel-on-change="{{ f.setSteg }}">
+                <sc-for list="{{ f.stegOptions }}" as="o" hint-placeholder-count="9"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </sc-raw-select>
+            </div>
+          </sc-for>
+        </div>
+        <div style="padding:12px 26px 22px;border-top:1px solid #EDE9E0;display:flex;align-items:center;gap:12px">
+          <span style="flex:1;font-size:11.5px;color:#A2544C;font-weight:600">{{ fasemap.reason }}</span>
+          <button sc-camel-on-click="{{ fasemap.cancel }}" style="border:1px solid #D5DBE0;background:#fff;color:#5B6772;cursor:pointer;padding:9px 18px;border-radius:999px;font-size:12.5px;font-weight:600;font-family:inherit">Avbryt</button>
+          <button sc-camel-on-click="{{ fasemap.confirm }}" style="border:none;background:{{ fasemap.confirmBg }};color:#fff;cursor:{{ fasemap.confirmCursor }};padding:9px 20px;border-radius:999px;font-size:12.5px;font-weight:600;font-family:inherit">Importer</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
   <!-- ===================== ARBEIDSFLATE ===================== -->
   <sc-if value="{{ isArbeid }}" hint-placeholder-val="{{ true }}">
     <div style="display:grid;grid-template-columns:270px 1fr;flex:1;min-height:0">
@@ -2475,6 +2503,9 @@ select.bv:hover{border-color:#2B5F7D}
                       <span style="font-size:10.5px;color:#2B5F7D;font-weight:600">🔗 {{ k.tallCount }} tall koblet</span>
                     </sc-if>
                   </div>
+                  <sc-if value="{{ k.hasKildeNote }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-size:10.5px;color:#5A4E86;margin-top:7px;font-style:italic">{{ k.kildeNote }}</div>
+                  </sc-if>
                 </div>
               </sc-for>
               <button sc-camel-on-click="{{ cur.addKons }}" style="align-self:flex-start;border:1px dashed #B9B2A3;background:none;cursor:pointer;border-radius:999px;padding:6px 15px;font-size:12px;color:#6B7885;font-weight:600;font-family:inherit">+ Konsekvens</button>
@@ -2697,6 +2728,140 @@ select.bv:hover{border-color:#2B5F7D}
     </div>
   </sc-if>
 
+  <!-- ===================== INNBOKS ===================== -->
+  <sc-if value="{{ isInnboks }}" hint-placeholder-val="{{ false }}">
+    <div style="padding:18px 22px;flex:1;overflow:auto">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px">
+        <div style="flex:1;min-width:240px">
+          <div style="font-size:16px;font-weight:700">Innboks — høsting, ikke portal</div>
+          <div style="font-size:11.5px;color:#6B7885;line-height:1.5;max-width:640px">Det pasienter, pårørende og helsepersonell faktisk har sagt — høstet muntlig i eksisterende arenaer og tastet inn av den som høstet. To kilder: friksjonspunkter fra Forløpsbyggeren og brukerhistorier.</div>
+        </div>
+        <button sc-camel-on-click="{{ innboks.nyHistorie }}" style="border:none;background:#2E7D5B;color:#fff;cursor:pointer;padding:8px 15px;border-radius:999px;font-size:12px;font-weight:600;font-family:inherit">+ Ny brukerhistorie</button>
+        <label style="border:1px solid #D9D2E4;background:#F3EFF8;color:#5A4E86;cursor:pointer;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:600">Importer friksjonspunkter (Forløpsbygger-JSON)<input type="file" accept="application/json,.json" sc-camel-on-change="{{ innboks.importFriksjon }}" style="display:none"></label>
+        <label style="border:1px solid #D5DBE0;background:#fff;color:#2B5F7D;cursor:pointer;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:600">Importer datasett<input type="file" accept="application/json,.json" sc-camel-on-change="{{ innboks.importDatasett }}" style="display:none"></label>
+        <button sc-camel-on-click="{{ innboks.eksporter }}" style="border:1px solid #D5DBE0;background:#fff;color:#2B5F7D;cursor:pointer;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:600;font-family:inherit">Eksporter JSON</button>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700">WIP-grense</span>
+        <div style="display:flex;align-items:center;gap:0;border:1px solid #D5DBE0;border-radius:8px;overflow:hidden">
+          <button sc-camel-on-click="{{ innboks.decWip }}" style="border:none;background:#F4F2EC;cursor:pointer;padding:4px 11px;font-size:14px;font-family:inherit;color:#5B6772">−</button>
+          <span style="padding:4px 12px;font-size:13px;font-weight:700;min-width:26px;text-align:center">{{ innboks.wipGrense }}</span>
+          <button sc-camel-on-click="{{ innboks.incWip }}" style="border:none;background:#F4F2EC;cursor:pointer;padding:4px 11px;font-size:14px;font-family:inherit;color:#5B6772">+</button>
+        </div>
+        <span style="font-size:12px;color:#6B7885">{{ innboks.aktivCount }} aktive kort</span>
+      </div>
+      <sc-if value="{{ innboks.wipOver }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#F7E4CE;border:1px solid #E7C9A0;color:#A2544C;border-radius:10px;padding:11px 15px;font-size:13px;font-weight:600;margin-bottom:12px">Innboksen er full — groom før dere høster mer. (Ny registrering er fortsatt mulig — vi blokkerer aldri innsamling av det noen faktisk sa.)</div>
+      </sc-if>
+
+      <sc-if value="{{ innboks.tom }}" hint-placeholder-val="{{ false }}">
+        <div style="font-size:12.5px;color:#B8B2A6;font-style:italic;padding:12px 0">Ingen kort i innboksen. Legg til en brukerhistorie, eller importer friksjonspunkter fra Forløpsbyggeren.</div>
+      </sc-if>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px">
+        <sc-for list="{{ innboks.aktive }}" as="k" hint-placeholder-count="3">
+          <div style="background:#fff;border:1px solid {{ k.gammelBd }};border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+              <span style="padding:2px 9px;border-radius:999px;font-size:10px;font-weight:700;background:{{ k.opphavBg }};color:{{ k.opphavFg }}">{{ k.opphavLabel }}</span>
+              <span style="font-size:10.5px;font-weight:600;color:{{ k.alderFg }}">{{ k.alderTxt }}</span>
+              <sc-if value="{{ k.erKnyttet }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;color:#2E7D5B;font-weight:600">✓ knyttet til {{ k.knyttetCount }}</span></sc-if>
+              <div style="flex:1"></div>
+              <button sc-camel-on-click="{{ k.arkiver }}" title="Arkivér med begrunnelse" style="border:1px solid #E7DAD8;background:#fff;color:#A2544C;cursor:pointer;border-radius:7px;padding:3px 9px;font-size:10.5px;font-family:inherit">Arkivér</button>
+            </div>
+
+            <sc-if value="{{ k.erFriksjon }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ k.edText }}" data-ph="Observert friksjon" style="font-size:13px;line-height:1.45;min-height:18px">{{ k.text }}</div>
+                <div style="font-size:10.5px;color:#5A4E86;font-style:italic;margin-top:4px">{{ k.kildeNote }}</div>
+                <div style="display:flex;align-items:center;gap:7px;margin-top:8px">
+                  <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700">Steg</span>
+                  <sc-raw-select class="bv" value="{{ k.steg }}" sc-camel-on-change="{{ k.setSteg }}">
+                    <sc-for list="{{ k.stegOptions }}" as="o" hint-placeholder-count="9"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                  </sc-raw-select>
+                  <sc-if value="{{ k.stegMissing }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;color:#C0574F;font-weight:600">velg steg</span></sc-if>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ k.erHistorie }}" hint-placeholder-val="{{ false }}">
+              <div>
+                <div style="background:#FBEEE6;border:1px solid #E7C9A0;color:#A2544C;border-radius:7px;padding:5px 9px;font-size:10.5px;font-weight:600">{{ k.advarsel }}</div>
+                <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ k.edSitat }}" data-ph="Skriv det de sa, ikke det du tolket." style="font-size:13px;font-style:italic;line-height:1.5;min-height:20px;margin-top:8px;padding:6px 9px;background:#F6F4EE;border-radius:7px">{{ k.sitat }}</div>
+                <sc-if value="{{ k.sitatMissing }}" hint-placeholder-val="{{ false }}"><div style="font-size:10.5px;color:#C0574F;font-weight:600;margin-top:3px">sitat mangler</div></sc-if>
+
+                <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:9px">
+                  <sc-raw-select class="bv" style="font-weight:600" value="{{ k.hvem }}" sc-camel-on-change="{{ k.setHvem }}">
+                    <sc-for list="{{ k.hvemOptions }}" as="o" hint-placeholder-count="4"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                  </sc-raw-select>
+                  <sc-if value="{{ k.showAktor }}" hint-placeholder-val="{{ false }}">
+                    <sc-raw-select class="bv" value="{{ k.aktor }}" sc-camel-on-change="{{ k.setAktor }}">
+                      <sc-for list="{{ k.aktorOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                    </sc-raw-select>
+                    <sc-raw-select class="bv" value="{{ k.rolle }}" sc-camel-on-change="{{ k.setRolle }}">
+                      <sc-for list="{{ k.rolleOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                    </sc-raw-select>
+                  </sc-if>
+                  <sc-if value="{{ k.showAndre }}" hint-placeholder-val="{{ false }}">
+                    <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ k.edAndre }}" data-ph="hvem?" style="font-size:12px;border:1px solid #D5DBE0;border-radius:6px;padding:3px 8px;min-width:80px">{{ k.andre }}</span>
+                  </sc-if>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:9px">
+                  <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700">Høstet</span>
+                  <sc-raw-select class="bv" value="{{ k.arena }}" sc-camel-on-change="{{ k.setArena }}">
+                    <sc-for list="{{ k.arenaOptions }}" as="o" hint-placeholder-count="5"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                  </sc-raw-select>
+                  <sc-if value="{{ k.visArenaAnnet }}" hint-placeholder-val="{{ false }}">
+                    <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ k.edArenaAnnet }}" data-ph="hvilken arena?" style="font-size:12px;border:1px solid #D5DBE0;border-radius:6px;padding:3px 8px;min-width:90px">{{ k.arenaAnnet }}</span>
+                  </sc-if>
+                  <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ k.edDato }}" data-ph="YYYY-MM-DD" style="font-size:12px;border:1px solid #D5DBE0;border-radius:6px;padding:3px 8px;min-width:96px">{{ k.dato }}</span>
+                </div>
+
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px">
+                  <span style="font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700">Tastet inn av</span>
+                  <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ k.edTastet }}" data-ph="navn" style="font-size:12px;border:1px solid #D5DBE0;border-radius:6px;padding:3px 8px;min-width:96px">{{ k.tastetAv }}</span>
+                  <sc-if value="{{ k.tastetMissing }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;color:#C0574F;font-weight:600">mangler</span></sc-if>
+                </div>
+                <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ k.edKontekst }}" data-ph="Kontekst (valgfri) — kort note" style="font-size:11.5px;color:#6B7885;margin-top:8px;min-height:14px">{{ k.kontekst }}</div>
+              </div>
+            </sc-if>
+
+            <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:4px;border-top:1px solid #F0ECE3;padding-top:9px">
+              <sc-raw-select class="bv" value="{{ k.knyttVal }}" sc-camel-on-change="{{ k.knytt }}">
+                <sc-for list="{{ k.needOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+              </sc-raw-select>
+              <button sc-camel-on-click="{{ k.opprett }}" style="border:1px solid #D5DBE0;background:#fff;color:#2B5F7D;cursor:pointer;border-radius:7px;padding:4px 11px;font-size:11px;font-weight:600;font-family:inherit">Opprett nytt behov fra denne</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+
+      <div style="margin-top:18px;border-top:1px solid #E7E2D9;padding-top:12px">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <button sc-camel-on-click="{{ innboks.toggleArkiv }}" style="border:1px solid #D5DBE0;background:#fff;color:#5B6772;cursor:pointer;border-radius:8px;padding:6px 13px;font-size:12px;font-weight:600;font-family:inherit">Arkiv ({{ innboks.arkivCount }})</button>
+          <sc-if value="{{ innboks.visArkiv }}" hint-placeholder-val="{{ false }}">
+            <input placeholder="Søk i arkivet …" value="{{ innboks.sok }}" sc-camel-on-input="{{ innboks.setSok }}" style="flex:1;min-width:180px;font-family:inherit;font-size:12px;border:1px solid #D5DBE0;border-radius:8px;padding:6px 10px" />
+          </sc-if>
+        </div>
+        <sc-if value="{{ innboks.visArkiv }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px">
+            <sc-for list="{{ innboks.arkiv }}" as="a" hint-placeholder-count="2">
+              <div style="display:flex;gap:9px;align-items:flex-start;background:#F6F4EE;border:1px solid #E3DECF;border-radius:9px;padding:9px 12px">
+                <span style="flex:none;padding:2px 8px;border-radius:999px;font-size:9.5px;font-weight:700;background:#EDEAE3;color:#6B7885">{{ a.opphavLabel }}</span>
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12px;line-height:1.4;color:#3F4A54">{{ a.tekst }}</div>
+                  <div style="font-size:10.5px;color:#A2544C;margin-top:2px">Arkivert: {{ a.begrunnelse }}</div>
+                </div>
+                <button sc-camel-on-click="{{ a.avarkiver }}" style="flex:none;border:1px solid #D5DBE0;background:#fff;color:#2B5F7D;cursor:pointer;border-radius:7px;padding:3px 9px;font-size:10.5px;font-family:inherit">Hent tilbake</button>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </sc-if>
+
   <!-- ===================== BIBLIOTEK ===================== -->
   <sc-if value="{{ isBib }}" hint-placeholder-val="{{ false }}">
     <div style="padding:20px 22px;flex:1;display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start">
@@ -2809,7 +2974,7 @@ select.bv:hover{border-color:#2B5F7D}
                 <sc-for list="{{ r.konsekvenser }}" as="k" hint-placeholder-count="2">
                   <div style="font-size:12.5px;line-height:1.5;display:flex;gap:8px;align-items:baseline">
                     <span style="flex:none;padding:1px 8px;border-radius:999px;font-size:9.5px;font-weight:700;background:{{ k.statusBg }};color:{{ k.statusFg }}">{{ k.statusShort }}</span>
-                    <span>{{ k.text }} <span style="color:#8B94A0">— rammer {{ k.rammerTxt }}</span></span>
+                    <span>{{ k.text }} <span style="color:#8B94A0">— rammer {{ k.rammerTxt }}</span><sc-if value="{{ k.hasKildeNote }}" hint-placeholder-val="{{ false }}"> <span style="color:#5A4E86;font-style:italic">({{ k.kildeNote }})</span></sc-if></span>
                   </div>
                 </sc-for>
                 <sc-if value="{{ r.noKons }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#A2544C;font-style:italic">Ingen konsekvenser beskrevet ennå.</div></sc-if>
@@ -2842,6 +3007,19 @@ select.bv:hover{border-color:#2B5F7D}
             </div>
           </div>
         </sc-for>
+
+        <div class="bv-report-need" style="padding:40px 0">
+          <div style="border-bottom:2px solid #22303B;padding-bottom:12px">
+            <div style="font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:#2B5F7D;font-weight:700">Vedlegg til SSU</div>
+            <div style="font-size:23px;font-weight:700;letter-spacing:-0.01em;margin-top:4px">Ubehandlede innspill</div>
+          </div>
+          <div style="margin-top:16px;font-size:12.5px;line-height:1.8">
+            <div>Kort i innboks (ubehandlet): <b>{{ ubehandlet.aktivCount }}</b></div>
+            <div>Eldste kort: <b>{{ ubehandlet.eldstTxt }}</b></div>
+            <div>Arkiverte kort (med begrunnelse): <b>{{ ubehandlet.arkivCount }}</b></div>
+            <div style="font-size:11.5px;color:#8B94A0;margin-top:10px;line-height:1.55;max-width:620px">En høstingskanal uten synlig behandling brenner tillit — forsinkelsen skal være synlig. Dette er en del av leveransen, ikke noe som skjules.</div>
+          </div>
+        </div>
       </div>
     </div>
   </sc-if>
@@ -2851,7 +3029,10 @@ select.bv:hover{border-color:#2B5F7D}
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{}">
 class Component extends DCLogic {
-  state = { tab: 'arbeid', sel: null, needs: null, lib: null, hjelp: true, del: null };
+  state = { tab: 'arbeid', sel: null, needs: null, lib: null, hjelp: true, del: null,
+    innboks: null, wipGrense: 15, innboksSok: '', visArkiv: false, fasemap: null };
+
+  LS = 'behovsanalyse-siv-v1';
 
   // Provenans: 'belagt' settes AUTOMATISK når et tall med status 'har' kobles til
   // linja (aldri manuelt). 'sagt' krever en kilde (sitat eller kildeNote). Den
@@ -2952,6 +3133,49 @@ class Component extends DCLogic {
            ((a.title || '') + '').trim() !== ((b.title || '') + '').trim();
   }
 
+  // ---- innboks + friksjonsbro (oppgave 3 og 6) ----
+  static WIP_STD = 15;
+  static ARENA = ['morgenmøte', 'vaktskifte', 'workshop', 'samarbeidsutvalg', 'annet'];
+  static ADVARSEL_PERSON = 'Ikke skriv navn, fødselsdato eller opplysninger som kan identifisere pasient/pårørende.';
+  static todayISO() { const d = new Date(); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  static daysSince(iso) { if (!iso) return 0; const t = new Date(iso).getTime(); if (isNaN(t)) return 0; return Math.max(0, Math.floor((Date.now() - t) / 86400000)); }
+  static faseTilSteg(faseId) { const map = (Component.SCHEMA().friksjonsbro || {}).faseTilSteg || {}; return map[faseId] || ''; }
+  // Leser en Forløpsbygger-eksport og henter ut friksjonspunkter (møter med utfylt 'flagg').
+  // Godtar ett forløp {navn,faser,moter}, {forlop:[...]} eller en array av forløp.
+  static parseFriksjon(data) {
+    let liste = [];
+    if (Array.isArray(data)) liste = data;
+    else if (data && Array.isArray(data.forlop)) liste = data.forlop;
+    else if (data && Array.isArray(data.moter)) liste = [data];
+    else if (data) liste = [data];
+    const kort = [];
+    liste.forEach(f => {
+      const faser = (f && f.faser) || [];
+      const moter = (f && f.moter) || [];
+      moter.forEach(m => {
+        const flagg = m && m.flagg ? ('' + m.flagg).trim() : '';
+        if (!flagg) return;
+        const faseId = (m && m.fase) || '';
+        const steg = Component.faseTilSteg(faseId);
+        const faseNavn = (faser.find(x => x.id === faseId) || {}).navn || faseId || '(ukjent fase)';
+        kort.push({ flagg, faseId, faseNavn, steg, moteTittel: (m && m.tittel) || '', ukjentFase: !steg });
+      });
+    });
+    return kort;
+  }
+  // Aktive (ikke-arkiverte) innbokskort.
+  static innboksAktive(innboks) { return (innboks || []).filter(k => !k.arkivert); }
+  static innboksArkiverte(innboks) { return (innboks || []).filter(k => k.arkivert); }
+  // Arkivering krever begrunnelse — uten begrunnelse skjer ingenting (aldri slett).
+  static arkiver(card, begrunnelse) {
+    const b = ((begrunnelse || '') + '').trim();
+    if (!b) return card;
+    return Object.assign({}, card, { arkivert: true, arkivBegrunnelse: b, arkivDato: Component.todayISO() });
+  }
+  // WIP: innboksen er «full» når antall aktive kort når grensen.
+  static wipOver(innboks, grense) { return Component.innboksAktive(innboks).length >= (grense || Component.WIP_STD); }
+  static kortArena(card) { return card && card.arena === 'annet' ? (card.arenaAnnet || '') : (card ? card.arena || '' : ''); }
+
   // ---- forløpssteg fra felles/schema.json (injisert som window.SIV_SCHEMA av sync.js) ----
   // Aldri hardkod steg-lista her — endre felles/schema.json og kjør `node sync.js`.
   static SCHEMA() { return (typeof window !== 'undefined' && window.SIV_SCHEMA) || {}; }
@@ -3027,10 +3251,36 @@ class Component extends DCLogic {
     ];
   }
 
+  componentDidMount() {
+    try {
+      const raw = localStorage.getItem(this.LS);
+      if (raw) {
+        const d = JSON.parse(raw);
+        const patch = {};
+        if (Array.isArray(d.needs)) patch.needs = d.needs;
+        if (d.lib) patch.lib = d.lib;
+        if (Array.isArray(d.innboks)) patch.innboks = d.innboks;
+        if (typeof d.wipGrense === 'number') patch.wipGrense = d.wipGrense;
+        if (Object.keys(patch).length) this.setState(patch);
+      }
+    } catch (e) {}
+  }
+  // Lagrer hele datasettet til localStorage (deling skjer via JSON-eksport/PDF).
+  persist(s) {
+    try {
+      localStorage.setItem(this.LS, JSON.stringify({
+        needs: s.needs || Component.defaults(), lib: s.lib || Component.libDefaults(),
+        innboks: s.innboks || [], wipGrense: s.wipGrense || Component.WIP_STD
+      }));
+    } catch (e) {}
+  }
   getNeeds() { return this.state.needs || Component.defaults(); }
   getLib() { return this.state.lib || Component.libDefaults(); }
-  setNeeds(fn) { this.setState(s => ({ needs: fn(s.needs || Component.defaults()) })); }
-  setLib(fn) { this.setState(s => ({ lib: fn(s.lib || Component.libDefaults()) })); }
+  getInnboks() { return this.state.innboks || []; }
+  setNeeds(fn) { this.setState(s => { const needs = fn(s.needs || Component.defaults()); const next = { ...s, needs }; this.persist(next); return { needs }; }); }
+  setLib(fn) { this.setState(s => { const lib = fn(s.lib || Component.libDefaults()); this.persist({ ...s, lib }); return { lib }; }); }
+  setInnboks(fn) { this.setState(s => { const innboks = fn(s.innboks || []); this.persist({ ...s, innboks }); return { innboks }; }); }
+  setWip(v) { this.setState(s => { const wipGrense = Math.max(1, v | 0) || Component.WIP_STD; this.persist({ ...s, wipGrense }); return { wipGrense }; }); }
   update(id, fn) { this.setNeeds(ns => ns.map(n => n.id === id ? fn(n) : n)); }
   dismissHjelp() { this.setState({ hjelp: false }); }
   uid(p) { return p + Math.random().toString(36).slice(2, 8); }
@@ -3053,6 +3303,112 @@ class Component extends DCLogic {
       return out;
     });
     this.setState({ del: null, sel: del.a.id });
+  }
+
+  // ---- innboks: registrering, arkiv, WIP ----
+  nyBrukerhistorie() {
+    const card = { id: this.uid('i'), type: 'brukerhistorie', sitat: '', hvem: 'pasient', aktor: '', rolle: '', andre: '', arena: 'morgenmøte', arenaAnnet: '', dato: Component.todayISO(), tastetAv: '', kontekst: '', hostetDato: Component.todayISO(), arkivert: false, arkivBegrunnelse: '', knyttetTil: [] };
+    this.setInnboks(list => [card].concat(list));
+    this.setState({ tab: 'innboks', visArkiv: false });
+  }
+  oppdaterKort(id, patch) { this.setInnboks(list => list.map(k => k.id === id ? Object.assign({}, k, patch) : k)); }
+  arkiverKort(id) {
+    const b = window.prompt('Arkivér kortet — kort begrunnelse (hvorfor er det ikke relevant nå?):');
+    if (b === null) return;
+    if (!b.trim()) { window.alert('Arkivering krever en begrunnelse. Kortet slettes aldri.'); return; }
+    this.setInnboks(list => list.map(k => k.id === id ? Component.arkiver(k, b) : k));
+  }
+  avarkiver(id) { this.oppdaterKort(id, { arkivert: false }); }
+
+  // ---- friksjonsbro (Forløpsbygger-JSON → innboks) ----
+  importFriksjonFil(e) {
+    const fil = e.target.files && e.target.files[0]; if (!fil) return;
+    const les = new FileReader();
+    les.onload = () => {
+      let data; try { data = JSON.parse(les.result); } catch (err) { window.alert('Ugyldig JSON-fil.'); return; }
+      const kort = Component.parseFriksjon(data);
+      if (!kort.length) { window.alert('Fant ingen møter med utfylt friksjonsflagg i filen.'); return; }
+      const ukjente = kort.filter(k => k.ukjentFase);
+      if (ukjente.length) {
+        const distinct = [];
+        ukjente.forEach(k => { if (!distinct.some(d => d.faseId === k.faseId)) distinct.push({ faseId: k.faseId, faseNavn: k.faseNavn, steg: '' }); });
+        this.setState({ fasemap: { pending: kort, faser: distinct } });
+      } else {
+        this.leggFriksjonKort(kort);
+      }
+    };
+    les.readAsText(fil); e.target.value = '';
+  }
+  leggFriksjonKort(kort) {
+    const nye = kort.map(k => ({ id: this.uid('i'), type: 'friksjon', text: k.flagg, steg: k.steg || '', faseNavn: k.faseNavn, moteTittel: k.moteTittel, kildeNote: 'Observert i møte: ' + (k.moteTittel || '(uten tittel)'), hostetDato: Component.todayISO(), arkivert: false, arkivBegrunnelse: '', knyttetTil: [] }));
+    this.setInnboks(list => list.concat(nye));
+    this.setState({ tab: 'innboks', visArkiv: false });
+  }
+  fasemapSet(faseId, steg) { this.setState(s => s.fasemap ? ({ fasemap: Object.assign({}, s.fasemap, { faser: s.fasemap.faser.map(f => f.faseId === faseId ? Object.assign({}, f, { steg }) : f) }) }) : {}); }
+  fasemapConfirm() {
+    const fm = this.state.fasemap; if (!fm) return;
+    if (!fm.faser.every(f => f.steg)) return;
+    const map = {}; fm.faser.forEach(f => { map[f.faseId] = f.steg; });
+    const kort = fm.pending.map(k => k.ukjentFase ? Object.assign({}, k, { steg: map[k.faseId] || '', ukjentFase: false }) : k);
+    this.setState({ fasemap: null });
+    this.leggFriksjonKort(kort);
+  }
+  fasemapCancel() { this.setState({ fasemap: null }); }
+
+  // ---- hele datasettet: eksport/import ----
+  eksporterDatasett() {
+    const data = { versjon: 1, verktoy: 'behovsanalyse', eksportert: Component.todayISO(), needs: this.getNeeds(), lib: this.getLib(), innboks: this.getInnboks(), wipGrense: this.state.wipGrense || Component.WIP_STD };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'behovsanalyse.json'; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+  }
+  importDatasettFil(e) {
+    const fil = e.target.files && e.target.files[0]; if (!fil) return;
+    const les = new FileReader();
+    les.onload = () => {
+      let d; try { d = JSON.parse(les.result); } catch (err) { window.alert('Ugyldig JSON-fil.'); return; }
+      if (!d || (!Array.isArray(d.needs) && !Array.isArray(d.innboks))) { window.alert('Filen ser ikke ut som et Behovsanalyse-datasett.'); return; }
+      if (!window.confirm('Importere datasett? Dette erstatter behov, bibliotek og innboks du har nå.')) return;
+      this.setState(s => {
+        const next = { needs: Array.isArray(d.needs) ? d.needs : s.needs, lib: d.lib || s.lib, innboks: Array.isArray(d.innboks) ? d.innboks : (s.innboks || []), wipGrense: typeof d.wipGrense === 'number' ? d.wipGrense : s.wipGrense, sel: null };
+        this.persist(Object.assign({}, s, next)); return next;
+      });
+    };
+    les.readAsText(fil); e.target.value = '';
+  }
+
+  // ---- grooming: innboks → behov ----
+  knyttFriksjonTilBehov(cardId, needId) {
+    const card = this.getInnboks().find(k => k.id === cardId); if (!card || !needId) return;
+    const kid = this.uid('k');
+    this.update(needId, x => ({ ...x, konsekvenser: (x.konsekvenser || []).concat([{ id: kid, text: card.text || '', rammer: {}, status: 'observert', kildeNote: card.kildeNote || '' }]) }));
+    this.oppdaterKort(cardId, { knyttetTil: (card.knyttetTil || []).concat([needId]) });
+  }
+  opprettBehovFraFriksjon(cardId) {
+    const card = this.getInnboks().find(k => k.id === cardId); if (!card) return;
+    const id = this.uid('n'); const kid = this.uid('k');
+    const need = { id, title: 'Nytt behov (fra observasjon)', group: '', steg: card.steg || '', problemstilling: Component.af(''), behov: [Component.bf(this.uid('b'), 'pasient', '', 'antatt')], tid: {}, tidNote: '', volum: '', volumStatus: 'hentes', ansvar: 'Uklart', konsekvenser: [{ id: kid, text: card.text || '', rammer: {}, status: 'observert', kildeNote: card.kildeNote || '' }], tall: [], losninger: [] };
+    this.setNeeds(ns => ns.concat([need]));
+    this.oppdaterKort(cardId, { knyttetTil: (card.knyttetTil || []).concat([id]) });
+    this.setState({ tab: 'arbeid', sel: id });
+  }
+  knyttHistorieTilBehov(cardId, needId) {
+    const card = this.getInnboks().find(k => k.id === cardId); if (!card || !needId) return;
+    const kilde = { sitat: card.sitat || '', note: '', arena: Component.kortArena(card), dato: card.dato || '', innboksIds: [cardId] };
+    const line = Component.bf(this.uid('b'), card.hvem || 'pasient', '', 'sagt', { aktor: card.aktor || '', rolle: card.rolle || '', andre: card.andre || '', kilde });
+    this.update(needId, x => ({ ...x, behov: (x.behov || []).concat([line]) }));
+    this.oppdaterKort(cardId, { knyttetTil: (card.knyttetTil || []).concat([needId]) });
+    this.setState({ tab: 'arbeid', sel: needId });
+  }
+  opprettBehovFraHistorie(cardId) {
+    const card = this.getInnboks().find(k => k.id === cardId); if (!card) return;
+    const id = this.uid('n');
+    const kilde = { sitat: card.sitat || '', note: '', arena: Component.kortArena(card), dato: card.dato || '', innboksIds: [cardId] };
+    const line = Component.bf(this.uid('b'), card.hvem || 'pasient', '', 'sagt', { aktor: card.aktor || '', rolle: card.rolle || '', andre: card.andre || '', kilde });
+    const need = { id, title: 'Nytt behov (fra brukerhistorie)', group: '', steg: '', problemstilling: Component.af(''), behov: [line], tid: {}, tidNote: '', volum: '', volumStatus: 'hentes', ansvar: 'Uklart', konsekvenser: [], tall: [], losninger: [] };
+    this.setNeeds(ns => ns.concat([need]));
+    this.oppdaterKort(cardId, { knyttetTil: (card.knyttetTil || []).concat([id]) });
+    this.setState({ tab: 'arbeid', sel: id });
   }
 
   opts(values, current, optional) {
@@ -3185,6 +3541,7 @@ class Component extends DCLogic {
       return {
         text: k.text, accent: S.accent, statusLabel: S.label, statusBg: S.bg, statusFg: S.fg,
         hasTall: tallCount > 0, tallCount,
+        hasKildeNote: !!((k.kildeNote || '') + '').trim(), kildeNote: k.kildeNote || '',
         edText: e => updK(y => ({ ...y, text: e.target.innerText })),
         cycleStatus: () => updK(y => ({ ...y, status: S.next })),
         rammer: Object.keys(Component.RAMME).map(rk => {
@@ -3300,7 +3657,7 @@ class Component extends DCLogic {
       kOpen, kLocked: !kOpen, kLockReason: 'fullfør A (eller merk felt «vet ikke»)', kOpacity: kOpen ? 1 : 0.6,
       kHasKons: konsCount > 0, konsCount, omforentCount, omforentPct: konsCount ? Math.round(omforentCount / konsCount * 100) : 0,
       konsekvenser,
-      addKons: () => this.update(n.id, x => ({ ...x, konsekvenser: [...(x.konsekvenser || []), { id: this.uid('k'), text: '', rammer: {}, status: 'pastatt' }] })),
+      addKons: () => this.update(n.id, x => ({ ...x, konsekvenser: [...(x.konsekvenser || []), { id: this.uid('k'), text: '', rammer: {}, status: 'pastatt', kildeNote: '' }] })),
       tall,
       addTall: () => this.update(n.id, x => ({ ...x, tall: [...(x.tall || []), { id: this.uid('t'), text: '', status: 'bestilles', verdi: '', kilde: '', eier: '', frist: '', konsIds: [] }] })),
       bOpen, bLocked: !bOpen, bLockReason: 'beskriv minst én konsekvens i K først', trinn,
@@ -3334,7 +3691,7 @@ class Component extends DCLogic {
     }));
 
     const mkTab = (id, label) => ({ label, bg: tab === id ? '#22303B' : 'transparent', fg: tab === id ? '#fff' : '#5B6772', go: () => this.setState({ tab: id }) });
-    const tabs = [mkTab('arbeid', 'Arbeidsflate'), mkTab('forlop', 'Forløpsoversikt'), mkTab('bibliotek', 'Bibliotek'), mkTab('rapport', 'Rapport')];
+    const tabs = [mkTab('arbeid', 'Arbeidsflate'), mkTab('forlop', 'Forløpsoversikt'), mkTab('innboks', 'Innboks'), mkTab('bibliotek', 'Bibliotek'), mkTab('rapport', 'Rapport')];
 
     const aktorer = (lib.aktorer || []).map((a, i) => ({
       navn: a.navn,
@@ -3376,7 +3733,7 @@ class Component extends DCLogic {
         volumTxt: (n.volum && n.volum.trim() ? n.volum : 'volum hentes'),
         aFields: aF,
         noKons: (n.konsekvenser || []).length === 0,
-        konsekvenser: (n.konsekvenser || []).map(k => { const S = Component.KSTATUS[k.status] || Component.KSTATUS.pastatt; return { text: k.text || '—', statusShort: S.short, statusBg: S.bg, statusFg: S.fg, rammerTxt: Object.keys(Component.RAMME).filter(rk => (k.rammer || {})[rk]).map(rk => Component.RAMME[rk].toLowerCase()).join(', ') || '—' }; }),
+        konsekvenser: (n.konsekvenser || []).map(k => { const S = Component.KSTATUS[k.status] || Component.KSTATUS.pastatt; return { text: k.text || '—', statusShort: S.short, statusBg: S.bg, statusFg: S.fg, hasKildeNote: !!((k.kildeNote || '') + '').trim(), kildeNote: k.kildeNote || '', rammerTxt: Object.keys(Component.RAMME).filter(rk => (k.rammer || {})[rk]).map(rk => Component.RAMME[rk].toLowerCase()).join(', ') || '—' }; }),
         noTall: (n.tall || []).length === 0,
         tall: (n.tall || []).map(t => { const S = Component.TSTATUS[t.status] || Component.TSTATUS.bestilles; const meta = t.status === 'har' ? [t.verdi, t.kilde].filter(Boolean).join(' · ') : t.status === 'bestilles' ? ['eier ' + (t.eier || '?'), 'frist ' + (t.frist || '?')].join(' · ') : (t.kilde || ''); return { text: t.text || '—', statusShort: S.short, statusBg: S.bg, statusFg: S.fg, meta: meta ? '(' + meta + ')' : '' }; }),
         noLos: (n.losninger || []).length === 0,
@@ -3436,9 +3793,103 @@ class Component extends DCLogic {
       };
     }
 
+    // ---- Innboks (oppgave 3 + 6) ----
+    const innboks = this.getInnboks();
+    const wipGrense = this.state.wipGrense || Component.WIP_STD;
+    const aktive = Component.innboksAktive(innboks);
+    const arkiverte = Component.innboksArkiverte(innboks);
+    const stegOptsInn = [{ value: '', label: '— velg steg —' }].concat(Component.FORLOPSSTEG().map(s => ({ value: s.id, label: s.navn })));
+    const needOpts = [{ value: '', label: 'Knytt til behov …' }].concat(raw.map(n => ({ value: n.id, label: (n.title || '(uten tittel)') + (n.steg ? ' · ' + Component.stegNavn(n.steg) : '') })));
+    const arenaOpts = Component.ARENA.map(a => ({ value: a, label: a }));
+    const hvemOpts = Object.keys(Component.HVEM).map(k => ({ value: k, label: Component.HVEM[k] }));
+    const libNames = (lib.aktorer || []).map(a => a.navn);
+    const kortVM = k => {
+      const alder = Component.daysSince(k.hostetDato);
+      const felles = {
+        id: k.id, opphav: k.type, erFriksjon: k.type === 'friksjon', erHistorie: k.type === 'brukerhistorie',
+        opphavLabel: k.type === 'friksjon' ? 'friksjon' : 'brukerhistorie',
+        opphavBg: k.type === 'friksjon' ? '#EAE6F3' : '#E4F1EA', opphavFg: k.type === 'friksjon' ? '#5A4E86' : '#2E7D5B',
+        alderTxt: alder === 0 ? 'høstet i dag' : (alder + ' dager siden høstet'), gammel: alder > 30,
+        alderFg: alder > 30 ? '#A2544C' : '#8B94A0', gammelBd: alder > 30 ? '#E7C9A0' : '#E7E2D9',
+        knyttetCount: (k.knyttetTil || []).length, erKnyttet: (k.knyttetTil || []).length > 0,
+        needOptions: needOpts, knyttVal: '', opprett: () => k.type === 'friksjon' ? this.opprettBehovFraFriksjon(k.id) : this.opprettBehovFraHistorie(k.id),
+        arkiver: () => this.arkiverKort(k.id)
+      };
+      if (k.type === 'friksjon') {
+        return Object.assign(felles, {
+          text: k.text || '', kildeNote: k.kildeNote || '', steg: k.steg || '', stegNavn: Component.stegNavn(k.steg) || 'ikke satt', stegMissing: !k.steg,
+          stegOptions: stegOptsInn, edText: e => this.oppdaterKort(k.id, { text: e.target.innerText }),
+          setSteg: e => this.oppdaterKort(k.id, { steg: e.target.value }),
+          knytt: e => { const v = e.target.value; if (v) this.knyttFriksjonTilBehov(k.id, v); }
+        });
+      }
+      const showAktor = k.hvem === 'helsepersonell', showAndre = k.hvem === 'andre';
+      return Object.assign(felles, {
+        sitat: k.sitat || '', sitatMissing: !((k.sitat || '') + '').trim(),
+        hvem: k.hvem || 'pasient', hvemLabel: this.behovLabel(k), hvemOptions: hvemOpts,
+        showAktor, showAndre, aktor: k.aktor || '', rolle: k.rolle || '', andre: k.andre || '',
+        aktorOptions: this.opts(libNames, k.aktor, true), rolleOptions: this.opts(this.rollerFor(lib, k.aktor), k.rolle, true),
+        arena: k.arena || '', arenaOptions: arenaOpts, visArenaAnnet: k.arena === 'annet', arenaAnnet: k.arenaAnnet || '',
+        dato: k.dato || '', datoMissing: !((k.dato || '') + '').trim(),
+        tastetAv: k.tastetAv || '', tastetMissing: !((k.tastetAv || '') + '').trim(),
+        kontekst: k.kontekst || '', advarsel: Component.ADVARSEL_PERSON,
+        edSitat: e => this.oppdaterKort(k.id, { sitat: e.target.innerText }),
+        setHvem: e => this.oppdaterKort(k.id, { hvem: e.target.value }),
+        setAktor: e => { const v = e.target.value; const r = this.rollerFor(lib, v); this.oppdaterKort(k.id, { aktor: v, rolle: r.indexOf(k.rolle) === -1 ? '' : k.rolle }); },
+        setRolle: e => this.oppdaterKort(k.id, { rolle: e.target.value }),
+        edAndre: e => this.oppdaterKort(k.id, { andre: e.target.innerText }),
+        setArena: e => this.oppdaterKort(k.id, { arena: e.target.value }),
+        edArenaAnnet: e => this.oppdaterKort(k.id, { arenaAnnet: e.target.innerText }),
+        edDato: e => this.oppdaterKort(k.id, { dato: e.target.innerText }),
+        edTastet: e => this.oppdaterKort(k.id, { tastetAv: e.target.innerText }),
+        edKontekst: e => this.oppdaterKort(k.id, { kontekst: e.target.innerText }),
+        knytt: e => { const v = e.target.value; if (v) this.knyttHistorieTilBehov(k.id, v); }
+      });
+    };
+    const sok = (this.state.innboksSok || '').toLowerCase();
+    const arkivFiltrert = arkiverte.filter(k => {
+      if (!sok) return true;
+      const hay = [k.text, k.sitat, k.kildeNote, k.arkivBegrunnelse, k.moteTittel, k.tastetAv, Component.kortArena(k)].filter(Boolean).join(' ').toLowerCase();
+      return hay.indexOf(sok) !== -1;
+    });
+    const innboksVM = {
+      aktive: aktive.slice().sort((a, b) => Component.daysSince(b.hostetDato) - Component.daysSince(a.hostetDato)).map(kortVM),
+      aktivCount: aktive.length, wipGrense, wipOver: Component.wipOver(innboks, wipGrense), tom: aktive.length === 0,
+      incWip: () => this.setWip(wipGrense + 1), decWip: () => this.setWip(wipGrense - 1),
+      nyHistorie: () => this.nyBrukerhistorie(),
+      visArkiv: this.state.visArkiv, toggleArkiv: () => this.setState(s => ({ visArkiv: !s.visArkiv })),
+      arkivCount: arkiverte.length,
+      arkiv: arkivFiltrert.map(k => ({ id: k.id, opphavLabel: k.type === 'friksjon' ? 'friksjon' : 'brukerhistorie', tekst: (k.type === 'friksjon' ? k.text : k.sitat) || '', begrunnelse: k.arkivBegrunnelse || '', avarkiver: () => this.avarkiver(k.id) })),
+      sok: this.state.innboksSok || '', setSok: e => this.setState({ innboksSok: e.target.value }),
+      importFriksjon: e => this.importFriksjonFil(e), importDatasett: e => this.importDatasettFil(e), eksporter: () => this.eksporterDatasett()
+    };
+
+    // fase→steg mapping-dialog (ukjent fase ved friksjonsimport)
+    const fm = this.state.fasemap;
+    let fasemapVM = null;
+    if (fm) {
+      const kanLukke = fm.faser.every(f => f.steg);
+      fasemapVM = {
+        faser: fm.faser.map(f => ({ faseId: f.faseId, faseNavn: f.faseNavn, steg: f.steg,
+          stegOptions: stegOptsInn, setSteg: e => this.fasemapSet(f.faseId, e.target.value) })),
+        kanLukke, confirmBg: kanLukke ? '#2B5F7D' : '#B7C2CA', confirmCursor: kanLukke ? 'pointer' : 'not-allowed',
+        reason: kanLukke ? '' : 'Velg et forløpssteg for hver ukjente fase før du kan importere.',
+        confirm: () => this.fasemapConfirm(), cancel: () => this.fasemapCancel(), antall: fm.pending.length
+      };
+    }
+
+    // Rapportens sluttseksjon «Ubehandlede innspill»
+    const eldst = aktive.slice().sort((a, b) => Component.daysSince(b.hostetDato) - Component.daysSince(a.hostetDato))[0];
+    const ubehandlet = {
+      aktivCount: aktive.length,
+      eldstTxt: eldst ? (Component.daysSince(eldst.hostetDato) + ' dager — ' + (eldst.type === 'friksjon' ? 'friksjon' : 'brukerhistorie')) : '—',
+      arkivCount: arkiverte.length, harNoe: aktive.length > 0 || arkiverte.length > 0
+    };
+
     return {
-      isArbeid: tab === 'arbeid', isBib: tab === 'bibliotek', isRapport: tab === 'rapport', isForlop: tab === 'forlop',
+      isArbeid: tab === 'arbeid', isBib: tab === 'bibliotek', isRapport: tab === 'rapport', isForlop: tab === 'forlop', isInnboks: tab === 'innboks',
       forlopKolonner, uplassertKort, harUplassert: uplassertKort.length > 0,
+      innboks: innboksVM, fasemapOpen: !!fm, fasemap: fasemapVM, ubehandlet,
       delOpen: !!del, del: delVM,
       tabs, rail, cur,
       hjelp: this.state.hjelp, stop: e => e.stopPropagation(),
