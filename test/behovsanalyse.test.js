@@ -247,5 +247,20 @@ console.log('Grooming til flere behov (oppgave 6.6, tilstandsbasert):');
   eq('konsekvensen har status observert', nX.konsekvenser[0].status, 'observert');
 })();
 
+console.log('Olga-scenario (brukerhistorie-først):');
+(() => {
+  const s = Component.scenarioOlga();
+  eq('to behov', s.needs.length, 2);
+  ok('begge behov er A-komplette', s.needs.every(n => c.aComplete(n)));
+  ok('behov ligger på ulike forløpssteg', s.needs[0].steg !== s.needs[1].steg);
+  // groomede behovslinjer har sitat → «sagt» er lovlig (ingen «kilde mangler»)
+  const medSitat = s.needs.flatMap(n => n.behov).filter(b => b.prov === 'sagt');
+  ok('minst tre «sagt»-linjer med kilde', medSitat.length >= 3 && medSitat.every(b => Component.kanVaereSagt(b)));
+  eq('fem brukerhistorier i innboksen', s.innboks.length, 5);
+  ok('alle innbokskort er brukerhistorier', s.innboks.every(k => k.type === 'brukerhistorie'));
+  eq('to kort er ennå ikke groomet', s.innboks.filter(k => (k.knyttetTil || []).length === 0).length, 2);
+  ok('ingen identitetsfelt på kortene', s.innboks.every(k => !('navn' in k) && !('fodselsdato' in k)));
+})();
+
 console.log('\n' + passed + ' passerte, ' + failed + ' feilet.');
 process.exit(failed ? 1 : 0);

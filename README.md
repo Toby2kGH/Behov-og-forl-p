@@ -21,6 +21,13 @@ persondata). «Importer friksjonspunkter (Forløpsbygger-JSON)» henter røde
 flagg fra en workshop. Kort groomes til behov; sitatet følger med og vises i
 rapporten. WIP-grense og alder gjør etterslep synlig.
 
+**Eksempeldata:** I Innboks-fanen kan du laste inn to eksempler. «Standard»
+er det opprinnelige demoinnholdet. «Olga — brukerhistorie-først» viser flyten
+fra ordrett sitat til behov: Olga er skrøpelig eldre hjemme som blir dårlig og
+ikke vet hvem hun skal kontakte, og den som får telefonen mangler plan. Noen
+kort er allerede groomet (sitatet vises på behovslinja), to ligger klare i
+innboksen til å øve grooming på. Å laste et eksempel erstatter det du har.
+
 **Åpne:** Dobbeltklikk på `index.html`, eller bruk den deployede lenken.
 Data lagres lokalt i nettleseren din (localStorage) — del arbeid via
 JSON-eksport («Eksporter JSON» / «Importer datasett» i Innboks-fanen), ikke

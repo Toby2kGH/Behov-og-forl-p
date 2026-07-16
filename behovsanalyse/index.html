@@ -2809,6 +2809,13 @@ select.bv:hover{border-color:#2B5F7D}
         <button sc-camel-on-click="{{ innboks.eksporter }}" style="border:1px solid #D5DBE0;background:#fff;color:#2B5F7D;cursor:pointer;padding:8px 13px;border-radius:999px;font-size:12px;font-weight:600;font-family:inherit">Eksporter JSON</button>
       </div>
 
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;background:#F3EFF8;border:1px solid #E0D7EC;border-radius:10px;padding:8px 12px">
+        <span style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#7A4E86;font-weight:700">Eksempeldata</span>
+        <button sc-camel-on-click="{{ innboks.lastOlga }}" style="border:1px solid #C9BEDA;background:#fff;color:#7A4E86;cursor:pointer;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:600;font-family:inherit">Olga — brukerhistorie-først</button>
+        <button sc-camel-on-click="{{ innboks.lastStandard }}" style="border:1px solid #D5DBE0;background:#fff;color:#5B6772;cursor:pointer;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:600;font-family:inherit">Standard-eksempel</button>
+        <span style="font-size:11px;color:#8B94A0;flex:1;min-width:180px">«Olga» viser flyten fra ordrett sitat til behov — noen kort er allerede groomet, to ligger klare i innboksen.</span>
+      </div>
+
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
         <span style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#8B94A0;font-weight:700">WIP-grense</span>
         <div style="display:flex;align-items:center;gap:0;border:1px solid #D5DBE0;border-radius:8px;overflow:hidden">
@@ -3342,6 +3349,73 @@ class Component extends DCLogic {
     ];
   }
 
+  // Alternativt eksempel med brukerhistorie i sentrum: «Olga» — skrøpelig eldre
+  // hjemme som blir dårlig. Viser flyten brukerhistorie (ordrett sitat) → behov,
+  // med noen kort allerede groomet (sitat vises på behovslinja) og noen som
+  // ligger i innboksen til å øve grooming på. Ingen persondata — Olga er et
+  // illustrasjonsnavn, ikke en ekte pasient.
+  static scenarioOlga() {
+    const sitatOlga = 'Når jeg blir dårlig hjemme vet jeg aldri hvem jeg skal ringe — fastlegen, legevakta eller hjemmesykepleien. Så jeg ringer datteren min, og hun blir redd.';
+    const sitatDatter = 'Når mor ringer om natta og er forvirra, tør jeg ikke annet enn å ringe 113. Jeg vil jo ikke at noe skal skje med henne.';
+    const sitatHjspl = 'Jeg får telefon om at Olga er dårlig, men jeg har ingen oppdatert plan å gå etter og ingen lege å konferere med på kveld. Da blir det ofte innleggelse for sikkerhets skyld.';
+    const sitatLegevakt = 'Olga kommer inn på legevakt midt på natta uten forhistorie. Når jeg ikke kjenner henne, blir det tryggest å legge inn.';
+    const sitatFastlege = 'Jeg får ofte ikke vite at Olga har vært på legevakt før det har gått flere dager. Da mister vi sjansen til å justere planen tidlig.';
+    const k = (sitat, arena, dato, innboksId) => ({ sitat: sitat, note: '', arena: arena, dato: dato, innboksIds: [innboksId] });
+    const needs = [
+      {
+        id: 'olga1', title: 'Vite hvem man kontakter ved forverring hjemme',
+        group: 'Olga · skrøpelig eldre · hjemme med hjemmetjeneste', steg: 'varsling',
+        problemstilling: Component.af('Olga og pårørende vet ikke hvem de skal kontakte når hun blir dårlig hjemme; de ender på 113 eller venter for lenge.', 'sagt'),
+        behov: [
+          Component.bf('b1', 'pasient', 'trenger å vite hvem hun skal kontakte ved ulike problemer, for å slippe å velge mellom 113 og å vente', 'sagt', { kilde: k(sitatOlga, 'samarbeidsutvalg', '2026-05-12', 'ih1') }),
+          Component.bf('b2', 'parorende', 'trenger én tydelig kontaktvei ved forverring, for å slippe å ringe 113 i redsel', 'sagt', { kilde: k(sitatDatter, 'samarbeidsutvalg', '2026-05-12', 'ih2') })
+        ],
+        tid: { D: 1, K: 1, N: 1, H: 1 }, tidNote: 'Hele døgnet — kveld/natt tyngst',
+        volum: '', volumStatus: 'hentes', ansvar: 'Felles',
+        konsekvenser: [
+          { id: 'k1', text: 'Unødige 113-anrop og innleggelser fordi det ikke finnes én tydelig kontaktvei ved forverring.', rammer: { pasient: 1, parorende: 1, system: 1 }, status: 'pastatt', kildeNote: '' }
+        ],
+        tall: [
+          { id: 't1', text: 'Andel 113-anrop fra hjemmeboende eldre som kunne vært håndtert på lavere nivå.', status: 'finnesikke', verdi: '', kilde: '', eier: '', frist: '', konsIds: ['k1'], behovIds: ['b1'], losIds: [] }
+        ],
+        losninger: []
+      },
+      {
+        id: 'olga2', title: 'Beslutningsstøtte når melding om syk pasient kommer',
+        group: 'Olga · den som får telefonen (hjemmesykepleie / legevakt)', steg: 'vurdering',
+        problemstilling: Component.af('Den som får telefon om at Olga er syk mangler oppdatert plan og noen å konferere med, og legger inn «for sikkerhets skyld».', 'sagt'),
+        behov: [
+          Component.bf('b1', 'helsepersonell', 'trenger en oppdatert plan og en lege å konferere med, for å kunne observere Olga trygt hjemme', 'sagt', { aktor: 'Hjemmesykepleie', rolle: 'Hjemmesykepleier', kilde: k(sitatHjspl, 'vaktskifte', '2026-06-02', 'ih3') }),
+          Component.bf('b2', 'helsepersonell', 'trenger tilgang til Olgas forhistorie og plan, for å unngå innleggelse i blinde', 'antatt', { aktor: 'Kommune', rolle: 'Legevaktslege' })
+        ],
+        tid: { K: 1, N: 1, H: 1 }, tidNote: 'Kveld, natt og helg',
+        volum: '', volumStatus: 'hentes', ansvar: 'Uklart',
+        konsekvenser: [
+          { id: 'k1', text: 'Innleggelse «for sikkerhets skyld» fordi den som får telefonen mangler plan og konfereringsmulighet.', rammer: { pasient: 1, personell: 1, system: 1 }, status: 'pastatt', kildeNote: '' }
+        ],
+        tall: [
+          { id: 't1', text: 'Andel innleggelser fra hjemmeboende eldre på kveld/natt uten forutgående legevurdering.', status: 'bestilles', verdi: '', kilde: 'KPR + kommunale data', eier: 'Analyseavd. (navn settes)', frist: 'Q4', konsIds: ['k1'], behovIds: ['b1'], losIds: [] }
+        ],
+        losninger: []
+      }
+    ];
+    const kort = (id, sitat, hvem, arena, dato, extra) => Object.assign({
+      id: id, type: 'brukerhistorie', sitat: sitat, hvem: hvem, aktor: '', rolle: '', andre: '',
+      arena: arena, arenaAnnet: '', dato: dato, tastetAv: 'K. Hansen', kontekst: '',
+      hostetDato: dato, arkivert: false, arkivBegrunnelse: '', knyttetTil: []
+    }, extra || {});
+    const innboks = [
+      // Allerede groomet til behovene over (sitatet vises på behovslinjene):
+      kort('ih1', sitatOlga, 'pasient', 'samarbeidsutvalg', '2026-05-12', { kontekst: 'Formidlet av brukerrepresentant på vegne av flere.', knyttetTil: ['olga1'] }),
+      kort('ih2', sitatDatter, 'parorende', 'samarbeidsutvalg', '2026-05-12', { knyttetTil: ['olga1'] }),
+      kort('ih3', sitatHjspl, 'helsepersonell', 'vaktskifte', '2026-06-02', { aktor: 'Hjemmesykepleie', rolle: 'Hjemmesykepleier', knyttetTil: ['olga2'] }),
+      // Ikke groomet ennå — øv grooming: «Knytt til behov …» eller «Opprett nytt behov».
+      kort('ih4', sitatLegevakt, 'helsepersonell', 'morgenmøte', '2026-06-20', { aktor: 'Kommune', rolle: 'Legevaktslege' }),
+      kort('ih5', sitatFastlege, 'helsepersonell', 'morgenmøte', '2026-04-10', { aktor: 'Fastlege', rolle: 'Fastlege', kontekst: 'Gammelt kort — vis at etterslep fremheves.' })
+    ];
+    return { needs: needs, lib: Component.libDefaults(), innboks: innboks, wipGrense: Component.WIP_STD };
+  }
+
   componentDidMount() {
     try {
       const raw = localStorage.getItem(this.LS);
@@ -3466,6 +3540,16 @@ class Component extends DCLogic {
       });
     };
     les.readAsText(fil); e.target.value = '';
+  }
+  // Last inn et eksempel-datasett (standard eller «Olga»). Erstatter alt.
+  lastScenario(navn) {
+    const data = navn === 'olga' ? Component.scenarioOlga() : { needs: Component.defaults(), lib: Component.libDefaults(), innboks: [], wipGrense: Component.WIP_STD };
+    const tittel = navn === 'olga' ? 'Olga-eksempelet (brukerhistorie-først)' : 'standard-eksempelet';
+    if (!window.confirm('Laste inn ' + tittel + '? Dette erstatter behov, bibliotek og innboks du har nå.')) return;
+    this.setState(s => {
+      const next = { needs: data.needs, lib: data.lib, innboks: data.innboks, wipGrense: data.wipGrense, sel: (data.needs[0] || {}).id || null, tab: 'innboks' };
+      this.persist(Object.assign({}, s, next)); return next;
+    });
   }
 
   // ---- grooming: innboks → behov ----
@@ -4051,7 +4135,8 @@ class Component extends DCLogic {
       arkivCount: arkiverte.length,
       arkiv: arkivFiltrert.map(k => ({ id: k.id, opphavLabel: k.type === 'friksjon' ? 'friksjon' : 'brukerhistorie', tekst: (k.type === 'friksjon' ? k.text : k.sitat) || '', begrunnelse: k.arkivBegrunnelse || '', avarkiver: () => this.avarkiver(k.id) })),
       sok: this.state.innboksSok || '', setSok: e => this.setState({ innboksSok: e.target.value }),
-      importFriksjon: e => this.importFriksjonFil(e), importDatasett: e => this.importDatasettFil(e), eksporter: () => this.eksporterDatasett()
+      importFriksjon: e => this.importFriksjonFil(e), importDatasett: e => this.importDatasettFil(e), eksporter: () => this.eksporterDatasett(),
+      lastOlga: () => this.lastScenario('olga'), lastStandard: () => this.lastScenario('standard')
     };
 
     // fase→steg mapping-dialog (ukjent fase ved friksjonsimport)
