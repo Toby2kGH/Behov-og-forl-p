@@ -3068,6 +3068,36 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   </sc-if>
 
 </sc-if>
+
+<!-- ===================== EKSPORT-DIALOG (med faseTilSteg) ===================== -->
+<sc-if value="{{ eksportDialog }}" hint-placeholder-val="{{ false }}">
+  <div sc-camel-on-click="{{ eksportInfo.lukk }}" style="position:fixed; inset:0; background:rgba(20,30,38,.55); z-index:80; display:flex; align-items:center; justify-content:center; padding:24px;">
+    <div sc-camel-on-click="{{ eksportInfo.stopp }}" style="background:#fff; border-radius:16px; max-width:560px; width:100%; max-height:88vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,.3);">
+      <div style="padding:22px 26px 12px; border-bottom:1px solid #E7EDF1;">
+        <div style="font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:#2B5F7D; font-weight:700;">Eksporter JSON</div>
+        <div style="font-size:19px; font-weight:700; margin-top:3px;">«{{ eksportInfo.navn }}»</div>
+        <div style="font-size:12.5px; color:#5B6B78; margin-top:6px; line-height:1.5;">Filen inneholder hele forløpet. Friksjonsflagg (<b>{{ eksportInfo.flaggCount }}</b> stk) følger alltid med på møtene og kan importeres som konsekvens-utkast i Behovsanalysen.</div>
+      </div>
+      <div style="padding:16px 26px;">
+        <div style="font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:#8595A1; font-weight:700; margin-bottom:8px;">Fase → forløpssteg (faseTilSteg)</div>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <sc-for list="{{ eksportInfo.faseRader }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; gap:9px; font-size:12.5px;">
+              <span style="flex:1; font-weight:600; color:#1D2B36;">{{ r.faseNavn }}</span>
+              <span style="color:#8595A1;">→</span>
+              <span style="padding:2px 9px; border-radius:999px; font-size:10.5px; font-weight:700; background:{{ r.stegBg }}; color:{{ r.stegFg }};">{{ r.stegNavn }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-size:11px; color:#8595A1; margin-top:10px; line-height:1.5;">Ukjente faser mappes i Behovsanalysen ved import. Tabellen ligger i felles/schema.json.</div>
+      </div>
+      <div style="padding:12px 26px 22px; border-top:1px solid #E7EDF1; display:flex; gap:10px; justify-content:flex-end;">
+        <button sc-camel-on-click="{{ eksportInfo.lukk }}" style="border:1px solid #C9D4DC; background:#fff; color:#5B6B78; cursor:pointer; padding:9px 18px; border-radius:999px; font:inherit; font-size:12.5px; font-weight:600;">Avbryt</button>
+        <button sc-camel-on-click="{{ eksportInfo.lastNed }}" style="border:none; background:#2B5F7D; color:#fff; cursor:pointer; padding:9px 20px; border-radius:999px; font:inherit; font-size:12.5px; font-weight:600;">Last ned JSON</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script="" data-props="{
@@ -3080,7 +3110,13 @@ class Component extends DCLogic {
     lastet: false, forlop: [], aktiv: 0, fane: 'forlop', visning: 'naa',
     modus: 'analyse', valgtMote: null, vsm: false, wsIndex: 0, aapneKort: {}, infoOpen: false,
     pending: null, pendingForut: '', nivaa: 'utvidet', rolle: '', wsEdit: false, wsMini: true,
+    eksportDialog: false,
   };
+
+  // felles/schema.json injisert av sync.js — kilden til sannhet for faseTilSteg.
+  SCHEMA() { return (typeof window !== 'undefined' && window.SIV_SCHEMA) || {}; }
+  faseTilSteg() { return (this.SCHEMA().friksjonsbro || {}).faseTilSteg || {}; }
+  stegNavn(id) { const s = (this.SCHEMA().forlopssteg || []).find((x) => x.id === id); return s ? s.navn : ''; }
 
   LS = 'forlopsbygger-siv-v6';
 
@@ -3245,12 +3281,14 @@ class Component extends DCLogic {
   eksporterJson() {
     const f = this.state.forlop[this.state.aktiv];
     if (!f) return;
+    // flagg (friksjonspunkter) ligger på hvert møte og følger alltid med i f.moter.
     const blob = new Blob([JSON.stringify(f, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = (f.navn || 'forlop') + '.json';
     a.click();
     setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+    this.setState({ eksportDialog: false });
   }
 
   importerFil(e) {
@@ -3334,6 +3372,21 @@ class Component extends DCLogic {
     const utvidet = s.nivaa !== 'enkel';
     const rolle = s.rolle || '';
     const tidNavn = { for: 'før møtet', i: 'i møtet', etter: 'etter møtet' };
+
+    // Eksport-dialog: vis at flagg følger med, og faseTilSteg-mappingen (synlig).
+    const fTilSteg = this.faseTilSteg();
+    const flaggMoter = (f.moter || []).filter((m) => m.flagg && ('' + m.flagg).trim());
+    const eksportInfo = {
+      navn: f.navn || 'forlop',
+      flaggCount: flaggMoter.length,
+      flaggListe: flaggMoter.map((m) => ({ tittel: m.tittel || '(uten tittel)', flagg: m.flagg })),
+      faseRader: (f.faser || []).map((fs) => {
+        const steg = fTilSteg[fs.id] || '';
+        return { faseNavn: fs.navn || fs.id, faseId: fs.id, stegNavn: steg ? this.stegNavn(steg) : 'ukjent — velges i Behovsanalysen', kjent: !!steg,
+          stegBg: steg ? '#E4F1EA' : '#F7ECD9', stegFg: steg ? '#2E7D5B' : '#A66A1F' };
+      }),
+      lastNed: () => this.eksporterJson(), lukk: () => this.setState({ eksportDialog: false }), stopp: (ev) => ev.stopPropagation()
+    };
 
     const merkeStil = (merke) => merke === 'ny'
       ? { fg: '#2F5E43', bg: '#DCEBE1' }
@@ -3996,7 +4049,8 @@ class Component extends DCLogic {
         this.lagre(forlop);
         return { forlop, aktiv: forlop.length - 1, valgtMote: null, visning: 'naa', infoOpen: true };
       }),
-      eksporter: () => this.eksporterJson(),
+      eksporter: () => this.setState({ eksportDialog: true }),
+      eksportDialog: s.eksportDialog, eksportInfo,
       importKlikk: () => { const el = document.getElementById('importfil'); if (el) el.click(); },
       importEndret: (e) => this.importerFil(e),
       skrivUt: () => window.print(),
