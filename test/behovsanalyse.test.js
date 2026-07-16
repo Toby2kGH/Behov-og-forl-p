@@ -32,12 +32,13 @@ function extractDcScript(html) {
   return html.slice(open, close);
 }
 
-// Minimal DCLogic-stubb: nok til å instansiere Component og kalle rene metoder.
+// Minimal DCLogic-stubb: setState leser/skriver this.state slik runtimen gjør,
+// så vi kan teste både rene metoder og tilstandsendringer (grooming).
 class DCLogicStub {
-  constructor() { this._state = this.state || {}; }
   setState(patch) {
-    const next = typeof patch === 'function' ? patch(this._state) : patch;
-    this._state = Object.assign({}, this._state, next);
+    const cur = this.state || {};
+    const next = typeof patch === 'function' ? patch(cur) : patch;
+    this.state = Object.assign({}, cur, next);
   }
 }
 
@@ -204,6 +205,46 @@ console.log('Trinn 4 — mobilisering (oppgave 4):');
   const aktiv = Component.aktivtBeskyttet(needs4);
   ok('kun ett aktivt beskyttet (avsluttet teller ikke)', aktiv && aktiv.needId === 'n1');
   ok('avsluttet beskyttet frigir slotten', Component.aktivtBeskyttet([{ id: 'x', losninger: [{ trinn: 4, beskyttet: true, utfall: 'videreført' }] }]) === null);
+})();
+
+console.log('Grooming til flere behov (oppgave 6.6, tilstandsbasert):');
+(() => {
+  const g = new Component();
+  g.state = {
+    tab: 'innboks', sel: null, wipGrense: 15,
+    needs: [
+      { id: 'nA', title: 'A', steg: 'hjemme', behov: [], konsekvenser: [], tall: [], losninger: [] },
+      { id: 'nB', title: 'B', steg: 'vurdering', behov: [], konsekvenser: [], tall: [], losninger: [] }
+    ],
+    lib: Component.libDefaults(),
+    innboks: [{ id: 'iH', type: 'brukerhistorie', sitat: 'Jeg får ikke sove', hvem: 'pasient', arena: 'morgenmøte', dato: '2026-03-01', knyttetTil: [] }]
+  };
+  g.knyttHistorieTilBehov('iH', 'nA');
+  g.knyttHistorieTilBehov('iH', 'nB');
+  const nA = g.state.needs.find(n => n.id === 'nA');
+  const nB = g.state.needs.find(n => n.id === 'nB');
+  eq('nA fikk én behovslinje', nA.behov.length, 1);
+  eq('nB fikk én behovslinje', nB.behov.length, 1);
+  eq('behovslinje-provenans er sagt (auto)', nA.behov[0].prov, 'sagt');
+  eq('originalsitatet følger med', nA.behov[0].kilde.sitat, 'Jeg får ikke sove');
+  const card = g.state.innboks.find(k => k.id === 'iH');
+  eq('kortet beholdes (én kildepost)', g.state.innboks.length, 1);
+  eq('kortet er knyttet til to behov', card.knyttetTil.length, 2);
+
+  // WIP blokkerer aldri registrering
+  const g2 = new Component();
+  g2.state = { innboks: [], wipGrense: 1 };
+  g2.nyBrukerhistorie(); g2.nyBrukerhistorie();
+  eq('registrering over WIP-grensen blokkeres ikke', g2.state.innboks.length, 2);
+  ok('WIP er overskredet', Component.wipOver(g2.state.innboks, 1));
+
+  // Friksjon-grooming lager konsekvens med status observert
+  const g3 = new Component();
+  g3.state = { needs: [{ id: 'nX', konsekvenser: [], tall: [], behov: [], losninger: [] }], innboks: [{ id: 'iF', type: 'friksjon', text: 'Venter for lenge', steg: 'varsling', kildeNote: 'Observert i møte: Triage', knyttetTil: [] }], lib: Component.libDefaults() };
+  g3.knyttFriksjonTilBehov('iF', 'nX');
+  const nX = g3.state.needs[0];
+  eq('friksjon-grooming lager én konsekvens', nX.konsekvenser.length, 1);
+  eq('konsekvensen har status observert', nX.konsekvenser[0].status, 'observert');
 })();
 
 console.log('\n' + passed + ' passerte, ' + failed + ' feilet.');
