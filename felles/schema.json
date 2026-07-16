@@ -1,0 +1,55 @@
+{
+  "versjon": "1.0",
+  "beskrivelse": "Felles datakontrakt for Forløpsbygger SiV og Behovsanalyse Tønsberg × SiV. Kilden til sannhet for forløpssteg og bro-formatet. Endres denne, kjør sync-skriptet slik at begge verktøy oppdateres.",
+
+  "forlopssteg": [
+    { "id": "hjemme",      "navn": "Hjemme" },
+    { "id": "varsling",    "navn": "Varsling / kontakt" },
+    { "id": "vurdering",   "navn": "Vurdering" },
+    { "id": "nivaa",       "navn": "Beslutning om nivå" },
+    { "id": "transport",   "navn": "Transport" },
+    { "id": "mottak",      "navn": "Mottak" },
+    { "id": "opphold",     "navn": "Opphold" },
+    { "id": "utskrivning", "navn": "Utskrivning" },
+    { "id": "forstedogn",  "navn": "Første døgn hjemme" }
+  ],
+
+  "konsekvensStatus": {
+    "omforent":  "Omforent med kommunen",
+    "pastatt":   "Påstått av oss — ikke omforent",
+    "observert": "Observert i forløpskartlegging — ikke omforent"
+  },
+
+  "tallStatus": {
+    "har":        "Har tallet (verdi + kilde)",
+    "bestilles":  "Kan bestilles (kilde, eier, frist)",
+    "finnesikke": "Finnes ikke — må læres fram"
+  },
+
+  "tallMaaler_kommentar": "Tall kobles via behovIds/konsIds/losIds. Kjeden: behovsvolum (hvor ofte oppstår behovet) → konsekvensvolum (hvor ofte går det galt) → løsningsbruk (brukes løsningen, og faller konsekvensen).",
+
+  "friksjonsbro": {
+    "beskrivelse": "Format for import av friksjonspunkter fra Forløpsbyggerens JSON-eksport inn i Behovsanalysen som konsekvens-utkast.",
+    "kilde": "Forløpsbygger-eksport: forlop[].moter[] der feltet 'flagg' er utfylt.",
+    "mapping": {
+      "flagg":       "konsekvens.text (utkast)",
+      "fase":        "konsekvens.steg — via faseTilSteg-tabellen under; ukjent fase → bruker velger i mapping-dialog",
+      "mote.tittel": "konsekvens.kildeNote ('Observert i møte: …')",
+      "status":      "settes alltid til 'observert'"
+    },
+    "faseTilSteg": {
+      "fase1": "varsling",
+      "fase2": "vurdering",
+      "fase3": "opphold",
+      "fase4": "forstedogn"
+    }
+  },
+
+  "trinnstige": [
+    { "n": 0, "navn": "Forebygg", "hint": "reduser at behovet oppstår" },
+    { "n": 1, "navn": "I linja / dagens ordninger", "hint": "kjentgjøre, mandat, kontaktvei" },
+    { "n": 2, "navn": "Utvidelse av dagens", "hint": "mer kraft på samme linje" },
+    { "n": 3, "navn": "Ny tjeneste / organisering", "hint": "innenfor dagens struktur" },
+    { "n": 4, "navn": "Mobilisering / strukturell nyskaping", "hint": "på tvers av aktørene — alltid probe, aldri plan" }
+  ]
+}
