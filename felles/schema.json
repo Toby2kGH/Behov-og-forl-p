@@ -41,7 +41,11 @@
       "fase1": "varsling",
       "fase2": "vurdering",
       "fase3": "opphold",
-      "fase4": "forstedogn"
+      "fase4": "forstedogn",
+      "hjemme": "hjemme",
+      "akutt": "vurdering",
+      "sykehus": "opphold",
+      "etter": "forstedogn"
     }
   },
 

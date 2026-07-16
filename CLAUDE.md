@@ -118,6 +118,85 @@ utskrivnings-/oppfølgingsenhet SiV + kommune). Regler:
   («belagt med tall») som settes AUTOMATISK når et tall med status 'har'
   kobles til linjen via behovIds — aldri manuelt.
 
+## Oppgave 6: Brukerhistorie-innboks (høsting, ikke portal)
+
+Formål: Behov skal kunne spores tilbake til det pasienter, pårørende og
+helsepersonell faktisk har sagt — ordrett — uten at verktøyet blir en åpen
+innmeldingskanal. Verktøyet er fortsatt et analyseinstrument for et lite
+team; høstingen skjer muntlig i eksisterende arenaer (morgenmøter,
+vaktskifter, workshops, brukerrepresentanter i samarbeidsutvalg), og den
+som høstet taster inn.
+
+### 6.1 Utvid innboksen fra oppgave 3
+Innboksen (som i dag tar imot friksjonspunkter fra Forløpsbygger-import)
+utvides til å ta imot en andre korttype: **brukerhistorie**. Felles
+innboks, to kilder, tydelig merket med opphav (chip: «friksjon» /
+«brukerhistorie»).
+
+### 6.2 Brukerhistorie-kortet
+Felter (alle obligatoriske unntatt merket valgfri):
+- **sitat** — ordrett hva personen sa. Fritekst. Hjelpetekst: «Skriv det
+  de sa, ikke det du tolket.»
+- **hvem** — aktørtype: pasient / pårørende / helsepersonell (m/ aktør+
+  rolle fra bibliotek) / andre
+- **høstet hvor/når** — arena (fritekst eller velger: morgenmøte,
+  vaktskifte, workshop, samarbeidsutvalg, annet) + dato
+- **tastet inn av** — navn
+- **kontekst** (valgfri) — kort note
+
+Ingen persondata om pasienten skal registreres: legg en fast, synlig
+advarsel på kortet: «Ikke skriv navn, fødselsdato eller opplysninger som
+kan identifisere pasient/pårørende.» Ingen felter for identitet skal
+finnes.
+
+### 6.3 Grooming-flyt (innboks → behov)
+- Fra innbokskortet: «Knytt til behov …» (velger blant eksisterende) eller
+  «Opprett nytt behov fra denne».
+- Ved knytting opprettes en behovslinje på målbehovet der:
+  - formuleringen fylles ut av bruker i behovsformatet
+    («trenger [å kunne hva] for å [oppnå hva]»)
+  - **originalsitatet følger med og vises side om side** med
+    oversettelsen (ekspanderbart på behovslinjen), slik at oversettelsen
+    er etterprøvbar
+  - provenans settes AUTOMATISK til «sagt» — og kan ikke settes til
+    «sagt» manuelt andre veier: «sagt» krever heretter et koblet sitat
+    eller en eksplisitt kildeNote (hvem sa det, hvor). Eksisterende
+    behovslinjer med provenans «sagt» uten kilde beholdes, men merkes
+    «kilde mangler».
+- Et innbokskort kan knyttes til flere behov (samme sitat kan belyse to
+  behov), men beholder én kilde-post.
+- Kort som vurderes irrelevante arkiveres med kort begrunnelse — aldri
+  slettes. Arkivet er søkbart.
+
+### 6.4 WIP-grense og forpliktelse
+- Innboksen har en synlig WIP-grense (standard 15, konfigurerbar).
+  Overskrides den, vises et tydelig banner: «Innboksen er full — groom
+  før dere høster mer.» Ny registrering er fortsatt mulig (aldri blokker
+  innsamling av det noen faktisk sa), men banneret består.
+- Innboks-oversikten viser alder per kort (dager siden høstet) og
+  fremhever kort eldre enn 30 dager. Begrunnelse: en høstingskanal uten
+  synlig behandling brenner tillit — forsinkelsen skal være pinlig synlig.
+
+### 6.5 Rapport
+- Behovslinjer med koblet sitat viser sitatet i rapporten (kursiv, med
+  arena og dato — aldri navn på den som sa det).
+- Rapporten får en sluttseksjon «Ubehandlede innspill»: antall kort i
+  innboks, eldste kort, antall arkiverte med begrunnelse. Dette er en del
+  av leveransen til SSU, ikke noe som skjules.
+
+### 6.6 Tester
+- «sagt»-provenans kan ikke oppstå uten sitat/kildeNote.
+- Grooming til to behov gir to behovslinjer, én kildepost.
+- Arkivering krever begrunnelse; arkiverte kort telles i rapporten.
+- WIP-banner utløses ved grensen; registrering blokkeres ikke.
+
+### Avgrensning (skal IKKE bygges)
+Ingen innmeldingsskjema for pasienter/pårørende, ingen delt lenke for
+innmelding, ingen lagring utenfor localStorage. Hvis en digital
+innmeldingskanal senere ønskes, er det en egen sak til linjen med eier,
+DPIA og personvernombud — noter dette som kommentar øverst i koden for
+innboks-modulen.
+
 ## Testkrav
 Skriv en liten testfil (Node + jsdom eller Playwright) som minimum dekker:
 - portlogikken (A-komplett, K-lås, B-lås, trinn 2/3/4-opplåsing,

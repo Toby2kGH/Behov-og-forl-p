@@ -68,7 +68,11 @@
       "fase1": "varsling",
       "fase2": "vurdering",
       "fase3": "opphold",
-      "fase4": "forstedogn"
+      "fase4": "forstedogn",
+      "hjemme": "hjemme",
+      "akutt": "vurdering",
+      "sykehus": "opphold",
+      "etter": "forstedogn"
     }
   },
   "trinnstige": [
@@ -3215,6 +3219,12 @@ class Component extends DCLogic {
   }
 
   // ---- innboks + friksjonsbro (oppgave 3 og 6) ----
+  // AVGRENSNING (oppgave 6): Innboksen er en INTERN høstingskanal — den som
+  // høstet taster inn. Det skal IKKE bygges innmeldingsskjema for pasienter/
+  // pårørende, ingen delt innmeldingslenke, og ingen lagring utenfor
+  // localStorage. Ønskes en digital innmeldingskanal senere, er det en egen
+  // sak til linjen med eier, DPIA og personvernombud. Ingen persondata om
+  // pasient/pårørende skal registreres (se ADVARSEL_PERSON).
   static WIP_STD = 15;
   static ARENA = ['morgenmøte', 'vaktskifte', 'workshop', 'samarbeidsutvalg', 'annet'];
   static ADVARSEL_PERSON = 'Ikke skriv navn, fødselsdato eller opplysninger som kan identifisere pasient/pårørende.';
