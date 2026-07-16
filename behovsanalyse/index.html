@@ -2605,6 +2605,32 @@ select.bv:hover{border-color:#2B5F7D}
                       <span style="font-size:11px;color:#A66A1F;font-weight:600">🔒 {{ tr.lockReason }}</span>
                     </sc-if>
                   </div>
+
+                  <sc-if value="{{ tr.isT4 }}" hint-placeholder-val="{{ false }}">
+                    <div style="margin-top:11px;background:#F6F0FA;border:1px solid #DCCFE8;border-radius:10px;padding:11px 13px">
+                      <div style="font-size:10.5px;color:#5B4270;line-height:1.5;margin-bottom:9px">Trinn 4 er alltid <b>probe</b> — helt nytenkning på tvers av aktørene. En ren «kun hvis lavere trinn feiler»-port åpner aldri; derfor to veier inn: en terskelport, eller ett beskyttet veddemål.</div>
+                      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+                        <span style="font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#7A4E86;font-weight:700">Terskelport</span>
+                        <span style="font-size:11px;color:#6B7885">hvis</span>
+                        <sc-raw-select class="bv" value="{{ tr.terskel.tallId }}" sc-camel-on-change="{{ tr.terskel.setTall }}">
+                          <sc-for list="{{ tr.terskel.tallOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                        </sc-raw-select>
+                        <span style="font-size:11px;color:#6B7885">ikke er</span>
+                        <sc-raw-select class="bv" value="{{ tr.terskel.retning }}" sc-camel-on-change="{{ tr.terskel.setRetning }}">
+                          <sc-for list="{{ tr.terskel.retningOptions }}" as="o" hint-placeholder-count="2"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                        </sc-raw-select>
+                        <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ tr.terskel.edVerdi }}" data-ph="terskel" style="font-size:12px;border:1px solid #DCCFE8;border-radius:6px;padding:3px 8px;min-width:56px">{{ tr.terskel.verdi }}</span>
+                        <span style="font-size:11px;color:#6B7885">innen</span>
+                        <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ tr.terskel.edDato }}" data-ph="YYYY-MM-DD" style="font-size:12px;border:1px solid #DCCFE8;border-radius:6px;padding:3px 8px;min-width:96px">{{ tr.terskel.dato }}</span>
+                      </div>
+                      <div style="font-size:11px;color:#5B4270;font-weight:600;margin-top:7px">{{ tr.terskel.statusTxt }}</div>
+                      <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:9px;border-top:1px solid #E6DAF0;padding-top:9px">
+                        <button sc-camel-on-click="{{ tr.apneBeskyttet }}" style="border:1px solid #C9BEDA;background:#fff;color:#7A4E86;cursor:pointer;border-radius:999px;padding:5px 14px;font-size:11.5px;font-weight:600;font-family:inherit">Åpne beskyttet veddemål</button>
+                        <sc-if value="{{ tr.beskyttetLaast }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px;color:#A2544C;font-weight:600">{{ tr.beskyttetReason }}</span></sc-if>
+                      </div>
+                    </div>
+                  </sc-if>
+
                   <div style="display:flex;flex-direction:column;gap:10px;margin-top:11px">
                     <sc-for list="{{ tr.losninger }}" as="l" hint-placeholder-count="1">
                       <div style="border:1px solid #E7E2D9;border-radius:10px;padding:13px 15px;background:{{ l.cardBg }};position:relative">
@@ -2653,6 +2679,43 @@ select.bv:hover{border-color:#2B5F7D}
                           <div style="margin-top:11px;margin-left:18px;background:#FBFAF7;border:1px solid #E7E2D9;border-radius:9px;padding:10px 12px">
                             <div style="font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;color:{{ l.finansFg }};font-weight:700">Hva slutter vi med / hva finansierer dette? (obligatorisk)</div>
                             <div sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ l.edFinans }}" data-ph="Ingen løsning uten at noe tas ned eller finansieres" style="font-size:12px;margin-top:3px;min-height:15px">{{ l.finans }}</div>
+                          </div>
+                        </sc-if>
+
+                        <sc-if value="{{ l.isT4 }}" hint-placeholder-val="{{ false }}">
+                          <div style="margin-top:11px;margin-left:18px;background:#F6F0FA;border:1px solid #DCCFE8;border-radius:9px;padding:10px 12px">
+                            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                              <div style="font-size:9.5px;letter-spacing:.04em;text-transform:uppercase;color:#7A4E86;font-weight:700;flex:1">Aktørlandskap — hvem må lykkes med hva (min. 2, én fra hver side)</div>
+                              <sc-if value="{{ l.beskyttet }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;background:#EDE3F3;color:#7A4E86;border-radius:999px;padding:2px 9px">beskyttet veddemål</span></sc-if>
+                              <sc-if value="{{ l.landskapOk }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px;font-weight:700;color:#2E7D5B">✓ dekket</span></sc-if>
+                            </div>
+                            <div style="display:flex;flex-direction:column;gap:7px;margin-top:8px">
+                              <sc-for list="{{ l.landskap }}" as="al" hint-placeholder-count="2">
+                                <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #E3DECF;border-radius:8px;padding:6px 8px">
+                                  <sc-raw-select class="bv" value="{{ al.aktor }}" sc-camel-on-change="{{ al.setAktor }}">
+                                    <sc-for list="{{ al.aktorOptions }}" as="o" hint-placeholder-count="3"><option value="{{ o.value }}">{{ o.label }}</option></sc-for>
+                                  </sc-raw-select>
+                                  <span sc-camel-on-click="{{ al.setSiv }}" style="cursor:pointer;font-size:10.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:{{ al.sivBg }};color:{{ al.sivFg }};border:1px solid #B7C2CA">SiV</span>
+                                  <span sc-camel-on-click="{{ al.setKommune }}" style="cursor:pointer;font-size:10.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:{{ al.kommuneBg }};color:{{ al.kommuneFg }};border:1px solid #A6D0BC">Kommune</span>
+                                  <span sc-camel-content-editable="{{ true }}" sc-camel-suppress-content-editable-warning="{{ true }}" sc-camel-on-blur="{{ al.edMal }}" data-ph="hva må denne aktøren lykkes med?" style="flex:1;min-width:150px;font-size:12px;border:1px solid #E3DECF;border-radius:6px;padding:3px 7px">{{ al.mal }}</span>
+                                  <button sc-camel-on-click="{{ al.remove }}" title="Fjern" style="border:none;background:none;cursor:pointer;color:#C9C2B4;font-size:12px">×</button>
+                                </div>
+                              </sc-for>
+                              <button sc-camel-on-click="{{ l.addLandskap }}" style="align-self:flex-start;border:1px dashed #C9BEDA;background:none;cursor:pointer;border-radius:999px;padding:4px 12px;font-size:11px;color:#7A4E86;font-weight:600;font-family:inherit">+ aktør</button>
+                            </div>
+                            <sc-if value="{{ l.beskyttet }}" hint-placeholder-val="{{ false }}">
+                              <div style="margin-top:9px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-top:1px solid #E6DAF0;padding-top:9px">
+                                <sc-if value="{{ l.avsluttet }}" hint-placeholder-val="{{ false }}">
+                                  <span style="font-size:11px;font-weight:700;color:#5B6772">Avsluttet: {{ l.utfallLabel }}</span>
+                                  <button sc-camel-on-click="{{ l.gjenapne }}" style="border:1px solid #D5DBE0;background:#fff;color:#2B5F7D;cursor:pointer;border-radius:7px;padding:3px 10px;font-size:10.5px;font-family:inherit">Gjenåpne</button>
+                                </sc-if>
+                                <sc-if value="{{ l.avsluttet }}" hint-placeholder-val="{{ true }}">
+                                  <span style="font-size:10.5px;color:#7A4E86">Avslutt veddemålet med utfall for å frigi slotten:</span>
+                                  <button sc-camel-on-click="{{ l.avsluttVidere }}" style="border:1px solid #A6D0BC;background:#fff;color:#2E7D5B;cursor:pointer;border-radius:7px;padding:3px 10px;font-size:10.5px;font-family:inherit">Videreført</button>
+                                  <button sc-camel-on-click="{{ l.avsluttNed }}" style="border:1px solid #E7DAD8;background:#fff;color:#A2544C;cursor:pointer;border-radius:7px;padding:3px 10px;font-size:10.5px;font-family:inherit">Lagt ned</button>
+                                </sc-if>
+                              </div>
+                            </sc-if>
                           </div>
                         </sc-if>
 
@@ -3005,6 +3068,24 @@ select.bv:hover{border-color:#2B5F7D}
                 <sc-if value="{{ r.noLos }}" hint-placeholder-val="{{ false }}"><div style="font-size:12px;color:#8B94A0;font-style:italic">Ingen løsninger foreslått ennå (låst til konsekvenser finnes).</div></sc-if>
               </div>
             </div>
+
+            <sc-if value="{{ r.harVeddemaal }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:16px">
+                <div style="font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#7A4E86;font-weight:700">Trinn 4 · Mobilisering / strukturell nyskaping</div>
+                <div style="display:flex;flex-direction:column;gap:10px;margin-top:7px">
+                  <sc-for list="{{ r.veddemaal }}" as="v" hint-placeholder-count="1">
+                    <div style="border:1px solid #DCCFE8;border-radius:9px;padding:10px 12px;background:#FAF7FD">
+                      <div style="font-size:12.5px;line-height:1.5"><span style="font-weight:700">{{ v.text }}</span> <span style="padding:0 7px;border-radius:999px;font-size:9.5px;font-weight:700;background:#EDE3F3;color:#7A4E86">{{ v.statusTxt }}</span></div>
+                      <div style="font-size:11px;color:#5B4270;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-top:7px">Aktørlandskap</div>
+                      <sc-for list="{{ v.landskap }}" as="al" hint-placeholder-count="2">
+                        <div style="font-size:11.5px;color:#3F4A54;line-height:1.5">· <b>{{ al.aktor }}</b> ({{ al.side }}) — {{ al.mal }}</div>
+                      </sc-for>
+                      <div style="font-size:11.5px;color:#5B6772;margin-top:6px">Målepunkt: {{ v.malepunkt }} · Stoppkriterium: {{ v.stopp }} · Revurderes: {{ v.revurdering }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-if>
           </div>
         </sc-for>
 
@@ -3432,6 +3513,38 @@ class Component extends DCLogic {
   trinn2Unlocked(n) { return (n.konsekvenser || []).some(k => k.status === 'omforent' || this.konsBacked(n, k)); }
   trinn3Unlocked(n) { return (n.konsekvenser || []).some(k => this.konsActual(n, k)) && n.volumStatus !== 'hentes'; }
 
+  // ---- Trinn 4: Mobilisering / strukturell nyskaping (oppgave 4) ----
+  // Aktørlandskap: minst to aktører, minst én fra hver side (SiV / kommune).
+  static t4LandskapOk(l) {
+    const e = (l.aktorlandskap || []).filter(x => x.aktor);
+    return e.length >= 2 && e.some(x => x.side === 'siv') && e.some(x => x.side === 'kommune');
+  }
+  static parseNum(s) { const m = ('' + (s == null ? '' : s)).replace(',', '.').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; }
+  static daysUntil(iso) { if (!iso) return null; const t = new Date(iso).getTime(); if (isNaN(t)) return null; return Math.ceil((t - Date.now()) / 86400000); }
+  // Terskelport: åpner trinn 4 for behovet hvis et koblet tall IKKE er under/over
+  // terskelen innen datoen. Før forfall vises nedtelling.
+  static terskelStatus(n) {
+    const p = n && n.terskel;
+    if (!p || !p.tallId || !p.dato || p.verdi === '' || p.verdi == null) return { aktiv: false, open: false };
+    const tall = (n.tall || []).find(t => t.id === p.tallId);
+    const dager = Component.daysUntil(p.dato);
+    const forfalt = dager != null && dager <= 0;
+    const verdi = tall ? Component.parseNum(tall.verdi) : null;
+    const terskel = Component.parseNum(p.verdi);
+    let maalOppnadd = false;
+    if (verdi != null && terskel != null) maalOppnadd = p.retning === 'under' ? (verdi < terskel) : (verdi > terskel);
+    return { aktiv: true, open: forfalt && !maalOppnadd, dager: dager, forfalt: forfalt, maalOppnadd: maalOppnadd, verdi: verdi, terskel: terskel, retning: p.retning, tallId: p.tallId, dato: p.dato };
+  }
+  // Det ene aktive beskyttede veddemålet i HELE datasettet (beskyttet uten utfall).
+  static aktivtBeskyttet(needs) {
+    for (const n of (needs || [])) for (const l of (n.losninger || [])) if (l.trinn === 4 && l.beskyttet && !l.utfall) return { needId: n.id, los: l };
+    return null;
+  }
+  t4Unlocked(n) {
+    if (Component.terskelStatus(n).open) return true;
+    return (n.losninger || []).some(l => l.trinn === 4 && l.beskyttet && !l.utfall);
+  }
+
   losMissing(l) {
     const miss = [];
     if (!(l.linjeeier || '').trim()) miss.push('linjeeier');
@@ -3439,6 +3552,7 @@ class Component extends DCLogic {
     if (!(l.revurdering || '').trim()) miss.push('revurderingsdato');
     if (l.kunnskap === 'probe') { if (!(l.malepunkt || '').trim()) miss.push('målepunkt'); if (!(l.stopp || '').trim()) miss.push('stopp/videre'); }
     if (l.trinn >= 2 && !(l.finans || '').trim()) miss.push('finansiering/nedtak');
+    if (l.trinn === 4 && !Component.t4LandskapOk(l)) miss.push('aktørlandskap (min. 2 aktører, én fra hver side)');
     return miss;
   }
 
@@ -3586,11 +3700,15 @@ class Component extends DCLogic {
       };
     });
 
-    const t2u = this.trinn2Unlocked(n), t3u = this.trinn3Unlocked(n);
+    const t2u = this.trinn2Unlocked(n), t3u = this.trinn3Unlocked(n), t4u = this.t4Unlocked(n);
+    const names = (lib.aktorer || []).map(a => a.navn);
+    const tStatus = Component.terskelStatus(n);
+    const beskyttetGlobal = Component.aktivtBeskyttet(this.getNeeds());
     const trinn = Component.TRINN.map(def => {
       let locked = false, lockReason = '';
       if (def.n === 2 && !t2u) { locked = true; lockReason = 'trenger omforent konsekvens eller (bestilt) tall'; }
       if (def.n === 3 && !t3u) { locked = true; lockReason = (n.volumStatus === 'hentes' ? 'volum står som «hentes»' : 'trenger konsekvens med faktisk tall'); }
+      if (def.n === 4 && !t4u) { locked = true; lockReason = 'åpnes av terskelport (koblet tall som ikke nås innen dato) ELLER ett beskyttet veddemål'; }
       const losninger = (n.losninger || []).map((l, idx) => ({ l, idx })).filter(o => o.l.trinn === def.n).map(o => {
         const l = o.l, idx = o.idx;
         const updL = fn => this.update(n.id, x => ({ ...x, losninger: x.losninger.map((y, m) => m === idx ? fn(y) : y) }));
@@ -3598,6 +3716,20 @@ class Component extends DCLogic {
         const miss = this.losMissing(l);
         const complete = miss.length === 0;
         const isAktiv = l.aktiv && complete;
+        const isT4 = def.n === 4;
+        const landskap = (l.aktorlandskap || []).map((e, ei) => {
+          const updE = fn => updL(y => ({ ...y, aktorlandskap: (y.aktorlandskap || []).map((z, m) => m === ei ? fn(z) : z) }));
+          return {
+            aktor: e.aktor || '', mal: e.mal || '', side: e.side || '',
+            aktorOptions: this.opts(names, e.aktor, true),
+            sivBg: e.side === 'siv' ? '#2B5F7D' : '#fff', sivFg: e.side === 'siv' ? '#fff' : '#8B94A0',
+            kommuneBg: e.side === 'kommune' ? '#2E7D5B' : '#fff', kommuneFg: e.side === 'kommune' ? '#fff' : '#8B94A0',
+            setAktor: ev => updE(z => ({ ...z, aktor: ev.target.value })),
+            edMal: ev => updE(z => ({ ...z, mal: ev.target.innerText })),
+            setSiv: () => updE(z => ({ ...z, side: 'siv' })), setKommune: () => updE(z => ({ ...z, side: 'kommune' })),
+            remove: () => updL(y => ({ ...y, aktorlandskap: (y.aktorlandskap || []).filter((_, m) => m !== ei) }))
+          };
+        });
         return {
           ...this.actorVM(lib, l, updL),
           text: l.text, kategori: l.kategori || '',
@@ -3612,12 +3744,23 @@ class Component extends DCLogic {
             { label: 'Landingssone i drift', labelFg: (l.landingssone || '').trim() ? '#8B94A0' : '#C0574F', value: l.landingssone, ph: 'hvor lever den', ed: edL('landingssone') },
             { label: 'Revurderingsdato', labelFg: (l.revurdering || '').trim() ? '#8B94A0' : '#C0574F', value: l.revurdering, ph: 'YYYY-MM-DD', ed: edL('revurdering') }
           ],
-          kunnskapLabel: l.kunnskap === 'probe' ? 'Må læres fram → probe' : 'Kjent → plan',
+          // Trinn 4 er alltid probe (låst). Ellers vanlig plan/probe-veksling.
+          kunnskapLocked: isT4,
+          kunnskapLabel: isT4 ? 'Probe (låst — alltid probe på trinn 4)' : (l.kunnskap === 'probe' ? 'Må læres fram → probe' : 'Kjent → plan'),
           kunnskapBg: l.kunnskap === 'probe' ? '#F7ECD9' : '#E3EDF3', kunnskapFg: l.kunnskap === 'probe' ? '#A66A1F' : '#2B5F7D',
-          cycleKunnskap: () => updL(y => ({ ...y, kunnskap: y.kunnskap === 'probe' ? 'plan' : 'probe' })),
+          cycleKunnskap: () => { if (isT4) return; updL(y => ({ ...y, kunnskap: y.kunnskap === 'probe' ? 'plan' : 'probe' })); },
           isProbe: l.kunnskap === 'probe', malepunkt: l.malepunkt, stopp: l.stopp,
           edMalepunkt: edL('malepunkt'), edStopp: edL('stopp'),
           needsFinans: def.n >= 2, finans: l.finans, finansFg: (l.finans || '').trim() ? '#8B94A0' : '#C0574F', edFinans: edL('finans'),
+          // Trinn 4-spesifikt
+          isT4, beskyttet: !!l.beskyttet,
+          landskap, landskapOk: Component.t4LandskapOk(l),
+          addLandskap: () => updL(y => ({ ...y, aktorlandskap: [...(y.aktorlandskap || []), { aktor: '', side: '', mal: '' }] })),
+          utfall: l.utfall || '', avsluttet: !!l.utfall,
+          utfallLabel: l.utfall === 'videreført' ? 'Videreført' : (l.utfall === 'lagt ned' ? 'Lagt ned' : ''),
+          avsluttVidere: () => updL(y => ({ ...y, utfall: 'videreført' })),
+          avsluttNed: () => updL(y => ({ ...y, utfall: 'lagt ned' })),
+          gjenapne: () => updL(y => ({ ...y, utfall: '' })),
           canActivate: complete, showMissing: !complete, missing: miss.join(', '),
           aktivBtnLabel: isAktiv ? '✓ Aktiv — klikk for utkast' : 'Marker som aktiv',
           aktivBtnBg: isAktiv ? '#2E7D5B' : '#fff', aktivBtnFg: isAktiv ? '#fff' : '#2E7D5B', aktivBtnBd: '#2E7D5B',
@@ -3625,11 +3768,40 @@ class Component extends DCLogic {
           remove: () => this.update(n.id, x => ({ ...x, losninger: x.losninger.filter((_, m) => m !== idx) }))
         };
       });
-      return {
+      const base = {
         n: def.n, title: def.title, hint: def.hint, badgeBg: def.badgeBg, badgeFg: def.badgeFg,
-        locked, lockReason, canAdd: !locked, losninger,
-        add: () => this.update(n.id, x => ({ ...x, losninger: [...(x.losninger || []), { id: this.uid('l'), trinn: def.n, text: '', kategori: '', aktor: '', rolle: '', involvering: '', linjeeier: '', landingssone: '', revurdering: '', kunnskap: 'plan', malepunkt: '', stopp: '', finans: '', aktiv: false }] }))
+        locked, lockReason, canAdd: !locked, isT4: def.n === 4, losninger,
+        add: () => this.update(n.id, x => ({ ...x, losninger: [...(x.losninger || []), { id: this.uid('l'), trinn: def.n, text: '', kategori: '', aktor: '', rolle: '', involvering: '', linjeeier: '', landingssone: '', revurdering: '', kunnskap: def.n === 4 ? 'probe' : 'plan', malepunkt: '', stopp: '', finans: '', aktiv: false, beskyttet: false, utfall: '', aktorlandskap: [] }] }))
       };
+      if (def.n === 4) {
+        const updTerskel = fn => this.update(n.id, x => ({ ...x, terskel: fn(x.terskel || { tallId: '', retning: 'under', verdi: '', dato: '' }) }));
+        const koblet = (n.tall || []).filter(t => (t.konsIds || []).length || (t.behovIds || []).length);
+        const beskyttetAnnetSted = beskyttetGlobal && beskyttetGlobal.needId !== n.id;
+        base.terskel = {
+          tallOptions: [{ value: '', label: '— velg koblet tall —' }].concat(koblet.map(t => ({ value: t.id, label: (t.text || '(tall)').slice(0, 44) }))),
+          harKoblede: koblet.length > 0,
+          tallId: (n.terskel || {}).tallId || '', retning: (n.terskel || {}).retning || 'under',
+          verdi: (n.terskel || {}).verdi || '', dato: (n.terskel || {}).dato || '',
+          setTall: e => updTerskel(t => ({ ...t, tallId: e.target.value })),
+          setRetning: e => updTerskel(t => ({ ...t, retning: e.target.value })),
+          edVerdi: e => updTerskel(t => ({ ...t, verdi: e.target.innerText })),
+          edDato: e => updTerskel(t => ({ ...t, dato: e.target.innerText })),
+          retningOptions: [{ value: 'under', label: 'under' }, { value: 'over', label: 'over' }],
+          aktiv: tStatus.aktiv, open: tStatus.open,
+          statusTxt: !tStatus.aktiv ? 'Ingen terskelport satt.'
+            : (tStatus.open ? 'Terskel ikke nådd innen frist — trinn 4 er åpnet.'
+              : (tStatus.forfalt ? 'Terskel nådd (' + (tStatus.retning === 'under' ? 'under' : 'over') + ' ' + tStatus.terskel + ') — porten åpnet ikke.'
+                : 'Nedtelling: ' + tStatus.dager + ' dager til frist (' + tStatus.dato + ').'))
+        };
+        base.beskyttetLaast = beskyttetAnnetSted;
+        base.beskyttetReason = beskyttetAnnetSted ? 'Ett beskyttet veddemål av gangen i hele datasettet — avslutt det aktive med utfall først.' : '';
+        base.apneBeskyttet = () => {
+          const other = Component.aktivtBeskyttet(this.getNeeds());
+          if (other && other.needId !== n.id) { window.alert('Det finnes allerede ett aktivt beskyttet veddemål. Avslutt det med utfall (videreført/lagt ned) før du åpner et nytt.'); return; }
+          this.update(n.id, x => ({ ...x, losninger: [...(x.losninger || []), { id: this.uid('l'), trinn: 4, text: '', kategori: '', aktor: '', rolle: '', involvering: '', linjeeier: '', landingssone: '', revurdering: '', kunnskap: 'probe', malepunkt: '', stopp: '', finans: '', aktiv: false, beskyttet: true, utfall: '', aktorlandskap: [] }] }));
+        };
+      }
+      return base;
     });
 
     const ed = f => e => this.update(n.id, x => ({ ...x, [f]: e.target.innerText }));
@@ -3742,9 +3914,17 @@ class Component extends DCLogic {
           const parts = [l.kategori, l.aktor, l.rolle, l.involvering].filter(Boolean).join(' · ');
           const eier = (l.linjeeier || '').trim() || '(mangler linjeeier)';
           return { n: l.trinn, text: l.text || '—', stateLabel: aktiv ? 'Aktiv' : 'Utkast', stateBg: aktiv ? '#E4F1EA' : '#F3E3E1', stateFg: aktiv ? '#2E7D5B' : '#C0574F', meta: [parts, 'eier: ' + eier, l.revurdering ? 'revurderes ' + l.revurdering : ''].filter(Boolean).join(' · '), finans: l.finans };
-        })
+        }),
+        veddemaal: (n.losninger || []).filter(l => l.trinn === 4).map(l => ({
+          text: l.text || '—', beskyttet: !!l.beskyttet,
+          statusTxt: l.utfall ? ('avsluttet — ' + l.utfall) : (l.beskyttet ? 'beskyttet veddemål — pågår' : 'pågår'),
+          landskap: (l.aktorlandskap || []).map(e => ({ aktor: e.aktor || '(aktør?)', side: e.side === 'siv' ? 'SiV' : (e.side === 'kommune' ? 'Kommune' : '?'), mal: e.mal || '(mål mangler)' })),
+          malepunkt: l.malepunkt || '(målepunkt mangler)', stopp: l.stopp || '(stoppkriterium mangler)', revurdering: l.revurdering || '(revurderingsdato mangler)'
+        })),
+        harVeddemaal: (n.losninger || []).some(l => l.trinn === 4)
       };
     });
+    const harVeddemaal = rapport.some(r => r.harVeddemaal);
 
     // Forløpsoversikt — alle behov plottet langs forløpsaksen (ni steg som swimlanes).
     const stegList = Component.FORLOPSSTEG();
@@ -3906,7 +4086,7 @@ class Component extends DCLogic {
       addInvolvering: () => this.setLib(L => ({ ...L, involvering: [...L.involvering, 'Ny måte'] })),
       addIdekategori: () => this.setLib(L => ({ ...L, idekategorier: [...L.idekategorier, 'Ny kategori'] })),
       addAnalysetall: () => this.setLib(L => ({ ...L, analysetall: [...L.analysetall, 'Nytt analysetall'] })),
-      rapport, printReport: () => window.print()
+      rapport, harVeddemaal, printReport: () => window.print()
     };
   }
 }

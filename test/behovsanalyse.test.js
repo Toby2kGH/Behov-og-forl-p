@@ -180,5 +180,31 @@ console.log('Grooming: «sagt» får kilde (oppgave 6):');
   eq('uten har-tall → beholder prov', Component.provDisp({ tall: [] }, { id: 'bx', prov: 'antatt' }), 'antatt');
 })();
 
+console.log('Trinn 4 — mobilisering (oppgave 4):');
+(() => {
+  ok('<2 aktører → aktørlandskap ikke ok', !Component.t4LandskapOk({ aktorlandskap: [{ aktor: 'SiV', side: 'siv' }] }));
+  ok('2 fra samme side → ikke ok', !Component.t4LandskapOk({ aktorlandskap: [{ aktor: 'A', side: 'siv' }, { aktor: 'B', side: 'siv' }] }));
+  ok('2 fra hver side → ok', Component.t4LandskapOk({ aktorlandskap: [{ aktor: 'A', side: 'siv' }, { aktor: 'B', side: 'kommune' }] }));
+  // trinn 4 er alltid probe: losMissing på trinn 4 uten probe-felt inkluderer probe-krav
+  const t4 = { trinn: 4, kunnskap: 'probe', linjeeier: 'X', landingssone: 'Y', revurdering: '2026-01-01', malepunkt: '', stopp: '', finans: 'Z', aktorlandskap: [{ aktor: 'A', side: 'siv' }, { aktor: 'B', side: 'kommune' }] };
+  const miss = c.losMissing(t4);
+  ok('trinn 4 krever målepunkt + stopp (probe)', miss.indexOf('målepunkt') !== -1 && miss.indexOf('stopp/videre') !== -1);
+  // terskelport
+  const needFremtid = { tall: [{ id: 't1', verdi: '10' }], terskel: { tallId: 't1', retning: 'under', verdi: '5', dato: '2999-01-01' } };
+  ok('terskel før frist → nedtelling, ikke åpen', Component.terskelStatus(needFremtid).open === false && Component.terskelStatus(needFremtid).dager > 0);
+  const needForfaltIkkeNadd = { tall: [{ id: 't1', verdi: '10' }], terskel: { tallId: 't1', retning: 'under', verdi: '5', dato: '2000-01-01' } };
+  ok('forfalt + mål ikke nådd (10 ikke < 5) → åpner trinn 4', Component.terskelStatus(needForfaltIkkeNadd).open === true);
+  const needForfaltNadd = { tall: [{ id: 't1', verdi: '3' }], terskel: { tallId: 't1', retning: 'under', verdi: '5', dato: '2000-01-01' } };
+  ok('forfalt + mål nådd (3 < 5) → porten åpner ikke', Component.terskelStatus(needForfaltNadd).open === false);
+  // beskyttet veddemål — eksklusivitet
+  const needs4 = [
+    { id: 'n1', losninger: [{ trinn: 4, beskyttet: true, utfall: '' }] },
+    { id: 'n2', losninger: [{ trinn: 4, beskyttet: true, utfall: 'lagt ned' }] }
+  ];
+  const aktiv = Component.aktivtBeskyttet(needs4);
+  ok('kun ett aktivt beskyttet (avsluttet teller ikke)', aktiv && aktiv.needId === 'n1');
+  ok('avsluttet beskyttet frigir slotten', Component.aktivtBeskyttet([{ id: 'x', losninger: [{ trinn: 4, beskyttet: true, utfall: 'videreført' }] }]) === null);
+})();
+
 console.log('\n' + passed + ' passerte, ' + failed + ' feilet.');
 process.exit(failed ? 1 : 0);
